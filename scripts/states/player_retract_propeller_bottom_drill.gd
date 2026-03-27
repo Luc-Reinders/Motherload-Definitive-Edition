@@ -1,0 +1,17 @@
+extends State
+class_name PlayerRetractPropellerBottomDrillState
+
+# DONE
+
+@onready var animated_sprite : AnimatedSprite2D = $"../../AnimatedSprite"
+
+func enter():
+	animated_sprite.play("retract_propeller_bottom_drill")
+	
+func exit():
+	pass
+
+func _on_animated_sprite_animation_finished() -> void:
+	if animated_sprite.animation == "retract_propeller_bottom_drill" and animated_sprite.frame > 0:
+		transitioned.emit(self, "DrillDown")
+	
