@@ -12,9 +12,9 @@ const MAX_Y_VELOCITY = 300.0
 
 const MAX_DRILL_VELOCITY = 100.0
 
-@onready var animated_sprite = $AnimatedSprite
-@onready var collision_shape = $CollisionShape2D
-@onready var earth = get_parent().get_node("Earth")
+@onready var animated_sprite : AnimatedSprite2D = $AnimatedSprite
+@onready var collision_shape : CollisionShape2D = $CollisionShape2D
+@onready var earth : Earth = get_parent().get_node("Earth")
 
 var drilling = false
 var drilling_target_cell: Vector2i
@@ -83,6 +83,11 @@ func _physics_process(delta: float) -> void:
 			var target_pos_x = drilling_target_global_pos.x
 			var init_start_x = target_pos_x - init_diff_x
 			global_position.x = init_start_x + init_diff_x * drilling_progress
+			
+			# Set dug dirt texture when at least halfway through drilling
+			if drilling_progress >= 0.5:
+				earth.set_tile(drilling_target_cell, "dug_dirt")
+				
 		else: # Player is at least as deep as the target y
 			finish_drilling()
 	
@@ -109,3 +114,11 @@ func _physics_process(delta: float) -> void:
 	velocity.x = clamp(velocity.x, -MAX_X_VELOCITY, MAX_X_VELOCITY)
 	
 	move_and_slide()
+
+
+# Drilling debugging
+func _process(delta: float):
+	queue_redraw()
+func _draw():
+	if drilling:
+		draw_circle(to_local(drilling_target_global_pos), 5.0, Color.RED)
