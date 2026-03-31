@@ -3,7 +3,7 @@ class_name PlayerFlightState
 
 # HALF DONE
 
-@onready var player : CharacterBody2D = $"../../../CharacterBody2D"
+@onready var player : Player = $"../../../Player"
 @onready var animated_sprite : AnimatedSprite2D = $"../../AnimatedSprite"
 
 func enter():

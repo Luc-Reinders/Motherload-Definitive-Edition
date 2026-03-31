@@ -1,17 +1,108 @@
-[gd_scene format=3 uid="uid://dumnvke81t2xa"]
+[gd_scene format=4 uid="uid://dumnvke81t2xa"]
 
 [ext_resource type="PackedScene" uid="uid://cgffgcwqawfu6" path="res://scenes/player.tscn" id="1_uwrxv"]
+[ext_resource type="Texture2D" uid="uid://cpoa24di1wkjb" path="res://assets/sprites/Tiles.png" id="2_yqjtg"]
 
-[sub_resource type="WorldBoundaryShape2D" id="WorldBoundaryShape2D_uwrxv"]
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lnu2h"]
+texture = ExtResource("2_yqjtg")
+texture_region_size = Vector2i(50, 50)
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+3:0/0 = 0
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+4:0/0 = 0
+4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+5:0/0 = 0
+5:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+6:0/0 = 0
+6:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+0:1/0 = 0
+0:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+1:1/0 = 0
+1:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+2:1/0 = 0
+2:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+3:1/0 = 0
+3:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+4:1/0 = 0
+4:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+5:1/0 = 0
+5:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+6:1/0 = 0
+6:1/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+0:2/0 = 0
+0:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+1:2/0 = 0
+2:2/0 = 0
+2:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+3:2/0 = 0
+3:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+4:2/0 = 0
+4:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+5:2/0 = 0
+5:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+6:2/0 = 0
+6:2/0/physics_layer_0/polygon_0/points = PackedVector2Array(25, -17.64319, 25, 25, -25, 25, -25, -17.498692)
+0:3/0 = 0
+0:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+1:3/0 = 0
+1:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+2:3/0 = 0
+2:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+3:3/0 = 0
+3:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+4:3/0 = 0
+4:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+5:3/0 = 0
+5:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+6:3/0 = 0
+6:3/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+0:4/0 = 0
+0:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+1:4/0 = 0
+1:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+2:4/0 = 0
+2:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -17.498692, 25, -18.063164, 25, 25, -25, 25)
+3:4/0 = 0
+3:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -17.498692, 25, -18.063164, 25, 25, -25, 25)
+4:4/0 = 0
+4:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, -5.644741, -25, -5.080265)
+5:4/0 = 0
+5:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, -5.644741, -25, -5.080265)
+6:4/0 = 0
+6:4/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+3:5/0 = 0
+4:5/0 = 0
+5:5/0 = 0
+6:5/0 = 0
+0:6/0 = 0
+1:6/0 = 0
+2:6/0 = 0
+3:6/0 = 0
+4:6/0 = 0
+5:6/0 = 0
+6:6/0 = 0
+6:6/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
+
+[sub_resource type="TileSet" id="TileSet_lbhrr"]
+tile_size = Vector2i(50, 50)
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_lnu2h")
 
 [node name="Game" type="Node2D" unique_id=2113382183]
 
-[node name="CharacterBody2D" parent="." unique_id=25987061 instance=ExtResource("1_uwrxv")]
-position = Vector2(-12, -50)
-
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1874662558]
 
-[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=2028575569]
+[node name="Earth" type="TileMapLayer" parent="." unique_id=883246333]
+tile_map_data = PackedByteArray("AAD9/wAAAAAGAAIAAAD+/wAAAAAGAAIAAAD//wAAAAAGAAIAAAAAAAAAAAAGAAIAAAABAAAAAAAGAAIAAAACAAAAAAAGAAIAAAADAAAAAAAGAAIAAAAEAAAAAAAGAAIAAAD8/wAAAAAGAAIAAAD7/wAAAAAGAAIAAAD6/wAAAAAGAAIAAAAFAAAAAAAGAAIAAAD6/wEAAAAAAAAAAAD7/wEAAAAAAAAAAAD8/wEAAAAAAAAAAAD9/wEAAAAAAAAAAAD+/wEAAAAAAAAAAAD//wEAAAAAAAAAAAAAAAEAAAAAAAAAAAABAAEAAAAAAAAAAAACAAEAAAAAAAEAADADAAEAAAAAAAAAAAAEAAEAAAAAAAAAAAAFAAEAAAAAAAAAAAD8/wIAAAACAAIAAAADAAIAAAACAAIAADD+/wIAAAAFAAYAAAD9/wIAAAACAAAAAAD//wIAAAACAAAAAAABAAIAAAABAAUAAAAAAAIAAAAAAAUAADACAAIAAAACAAYAAFACAAMAAAAAAAUAAFABAAMAAAABAAAAAAAAAAMAAAABAAAAAAD//wMAAAABAAAAAAD+/wMAAAABAAAAAAD9/wMAAAABAAAAAAD8/wMAAAABAAAAAAD6/wIAAAABAAAAAAD6/wMAAAABAAAAAAD7/wMAAAABAAAAAAD7/wIAAAABAAAAAAADAAMAAAABAAAAAAAEAAMAAAABAAAAAAAEAAIAAAABAAAAAAAFAAIAAAABAAAAAAAFAAMAAAABAAAAAAA=")
+tile_set = SubResource("TileSet_lbhrr")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=1416950791]
-shape = SubResource("WorldBoundaryShape2D_uwrxv")
+[node name="Player" parent="." unique_id=25987061 instance=ExtResource("1_uwrxv")]
+position = Vector2(-12, -50)

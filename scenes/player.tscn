@@ -642,7 +642,7 @@ script = ExtResource("1_g2els")
 
 [node name="AnimatedSprite" type="AnimatedSprite2D" parent="." unique_id=1141550430]
 sprite_frames = SubResource("SpriteFrames_31cv2")
-animation = &"turn_ground"
+animation = &"idle"
 autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1317438549]
@@ -717,9 +717,9 @@ metadata/_custom_type_script = "uid://cgqdsq70hynhh"
 [connection signal="animation_finished" from="AnimatedSprite" to="State Machine/TurnFlight" method="_on_animated_sprite_animation_finished"]
 [connection signal="animation_finished" from="AnimatedSprite" to="State Machine/ExtendPropellerSideDrill" method="_on_animated_sprite_animation_finished"]
 [connection signal="animation_finished" from="AnimatedSprite" to="State Machine/ExtendPropellerBottomDrill" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="State Machine/RetractPropellerBottomDrill" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="State Machine/RetractPropellerSideDrill" method="_on_animated_sprite_animation_finished"]
 [connection signal="animation_finished" from="AnimatedSprite" to="State Machine/RetractSideDrill" method="_on_animated_sprite_animation_finished"]
 [connection signal="animation_finished" from="AnimatedSprite" to="State Machine/RetractBottomDrill" method="_on_animated_sprite_animation_finished"]
 [connection signal="animation_finished" from="AnimatedSprite" to="State Machine/ExtendSideDrill" method="_on_animated_sprite_animation_finished"]
 [connection signal="animation_finished" from="AnimatedSprite" to="State Machine/ExtendBottomDrill" method="_on_animated_sprite_animation_finished"]
-[connection signal="animation_finished" from="AnimatedSprite" to="State Machine/RetractPropellerBottomDrill" method="_on_animated_sprite_animation_finished"]
-[connection signal="animation_finished" from="AnimatedSprite" to="State Machine/RetractPropellerSideDrill" method="_on_animated_sprite_animation_finished"]
