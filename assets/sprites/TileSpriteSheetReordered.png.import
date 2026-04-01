@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c6w2dlvfvy0gg"
-path="res://.godot/imported/Pod.png-2c275da3987370529126785a33abd539.ctex"
+uid="uid://dr447ifct57bv"
+path="res://.godot/imported/TileSpriteSheetReordered.png-a8275ce9c55955da52d4c24899c6bc57.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/sprites/Pod.png"
-dest_files=["res://.godot/imported/Pod.png-2c275da3987370529126785a33abd539.ctex"]
+source_file="res://assets/sprites/TileSpriteSheetReordered.png"
+dest_files=["res://.godot/imported/TileSpriteSheetReordered.png-a8275ce9c55955da52d4c24899c6bc57.ctex"]
 
 [params]
 
