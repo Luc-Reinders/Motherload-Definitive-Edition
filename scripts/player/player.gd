@@ -86,7 +86,8 @@ func _physics_process(delta: float) -> void:
 			
 			# Set dug dirt texture when at least halfway through drilling
 			if drilling_progress >= 0.5:
-				earth.set_tile(drilling_target_cell, "dug_dirt")
+				pass # TODO: FIX WITH NEW LAYERING SCHEME
+				#earth.set_tile(drilling_target_cell, Tiles.HALF_DUG)
 			
 		else: # Player is at least as deep as the target y
 			finish_drilling()
