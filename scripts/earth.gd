@@ -11,7 +11,9 @@ enum TileTransform {
 }
 
 func _ready():
-	set_appropriate_cave_texture(Vector2i(0,0))
+	for y in range(-6, 6):
+		for x in range(-11, 11):
+			set_appropriate_cave_texture(Vector2i(x,y))
 
 ## We are using atlas coordinates to identify cells. This function is a shortcut
 func get_tile(cell: Vector2i) -> Vector2i:
@@ -63,13 +65,13 @@ func set_appropriate_cave_texture(cell: Vector2i) -> void:
 	elif !t and r and !b and l:
 		set_tile(cell, Tiles.CAVE2, TileTransform.ROTATE_90)
 	
-	elif t and !r and !b and !l:
+	elif t and !r and !b_r and !b and !b_l and !l:
 		set_tile(cell, Tiles.CAVE3, TileTransform.ROTATE_0)
-	elif !t and r and !b and !l:
+	elif !t and r and !b and !b_l and !l and !t_l:
 		set_tile(cell, Tiles.CAVE3, TileTransform.ROTATE_90)
-	elif !t and !r and b and !l:
+	elif !t and !t_r and !r and b and !l and !t_l:
 		set_tile(cell, Tiles.CAVE3, TileTransform.ROTATE_180)
-	elif !t and !r and !b and l:
+	elif !t and !t_r and !r and !b_r and !b and l:
 		set_tile(cell, Tiles.CAVE3, TileTransform.ROTATE_270)
 
 	elif t and !r and b_r and !b and l:
@@ -98,6 +100,64 @@ func set_appropriate_cave_texture(cell: Vector2i) -> void:
 		set_tile(cell, Tiles.CAVE6, TileTransform.ROTATE_180)
 	elif !t and !t_r and !r and b and l:
 		set_tile(cell, Tiles.CAVE6, TileTransform.ROTATE_270)
+	
+	elif !t and t_r and !r and !b_r and !b and l:
+		set_tile(cell, Tiles.CAVE7, TileTransform.ROTATE_0)
+	elif t and !r and b_r and !b and !b_l and !l:
+		set_tile(cell, Tiles.CAVE7, TileTransform.ROTATE_90)
+	elif !t and r and !b and b_l and !l and !t_l:
+		set_tile(cell, Tiles.CAVE7, TileTransform.ROTATE_180)
+	elif !t and !t_r and !r and b and !l and t_l:
+		set_tile(cell, Tiles.CAVE7, TileTransform.ROTATE_270)
+	elif !t and !t_r and !r and b_r and !b and l:
+		set_tile(cell, Tiles.CAVE7, TileSetAtlasSource.TRANSFORM_FLIP_V) # mirror
+	elif t and !r and !b_r and !b and b_l and !l:
+		set_tile(cell, Tiles.CAVE7, TileSetAtlasSource.TRANSFORM_TRANSPOSE) # mirror + 90 degrees
+	elif !t and r and !b and !b_l and !l and t_l:
+		set_tile(cell, Tiles.CAVE7, TileSetAtlasSource.TRANSFORM_FLIP_H) # mirror + 180 degrees
+	elif !t and t_r and !r and b and !l and !t_l:
+		set_tile(cell, Tiles.CAVE7, TileTransform.ROTATE_270 | TileSetAtlasSource.TRANSFORM_FLIP_H) # mirror + 270 degrees
+	
+	# TODO: Check if this tile has to be randomly rotated (what happens in original Motherload?)
+	elif t and r and b and l: 
+		set_tile(cell, Tiles.CAVE8, TileTransform.ROTATE_0)
+	
+	elif !t and t_r and !r and b_r and !b and b_l and !l and t_l:
+		set_tile(cell, Tiles.CAVE9, TileTransform.ROTATE_0)
+	
+	elif !t and t_r and !r and b_r and !b and !b_l and !l and t_l:
+		set_tile(cell, Tiles.CAVE10, TileTransform.ROTATE_0)
+	elif !t and t_r and !r and b_r and !b and b_l and !l and !t_l:
+		set_tile(cell, Tiles.CAVE10, TileTransform.ROTATE_90)
+	elif !t and !t_r and !r and b_r and !b and b_l and !l and t_l:
+		set_tile(cell, Tiles.CAVE10, TileTransform.ROTATE_180)
+	elif !t and t_r and !r and !b_r and !b and b_l and !l and t_l:
+		set_tile(cell, Tiles.CAVE10, TileTransform.ROTATE_270)
+	
+	elif !t and t_r and !r and b_r and !b and !b_l and !l and !t_l:
+		set_tile(cell, Tiles.CAVE11, TileTransform.ROTATE_0)
+	elif !t and !t_r and !r and b_r and !b and b_l and !l and !t_l:
+		set_tile(cell, Tiles.CAVE11, TileTransform.ROTATE_90)
+	elif !t and !t_r and !r and !b_r and !b and b_l and !l and t_l:
+		set_tile(cell, Tiles.CAVE11, TileTransform.ROTATE_180)
+	elif !t and t_r and !r and !b_r and !b and !b_l and !l and t_l:
+		set_tile(cell, Tiles.CAVE11, TileTransform.ROTATE_270)
+	
+	elif !t and t_r and !r and !b_r and !b and b_l and !l and !t_l:
+		set_tile(cell, Tiles.CAVE12, TileTransform.ROTATE_0)
+	elif !t and !t_r and !r and b_r and !b and !b_l and !l and t_l:
+		set_tile(cell, Tiles.CAVE12, TileTransform.ROTATE_90)
+	
+	elif !t and !t_r and !r and !b_r and !b and !b_l and !l and t_l:
+		set_tile(cell, Tiles.CAVE13, TileTransform.ROTATE_0)
+	elif !t and t_r and !r and !b_r and !b and !b_l and !l and !t_l:
+		set_tile(cell, Tiles.CAVE13, TileTransform.ROTATE_90)
+	elif !t and !t_r and !r and b_r and !b and !b_l and !l and !t_l:
+		set_tile(cell, Tiles.CAVE13, TileTransform.ROTATE_180)
+	elif !t and !t_r and !r and !b_r and !b and b_l and !l and !t_l:
+		set_tile(cell, Tiles.CAVE13, TileTransform.ROTATE_270)
+
+
 
 
 
