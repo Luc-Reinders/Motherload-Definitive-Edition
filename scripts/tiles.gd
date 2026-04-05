@@ -41,7 +41,7 @@ static func is_misc_tile(tile: Vector2i) -> bool:
 static func is_empty_tile(tile: Vector2i) -> bool:
 	return tile == NONE
 
-## Checks whether the tile has no texture or is a cave tile
+## Checks whether the tile has no texture or a cave texture
 static func is_air_tile(tile: Vector2i) -> bool:
 	return is_cave_tile(tile) or is_empty_tile(tile)
 ## Checks whether the tile occupies space (player cannot move into it)

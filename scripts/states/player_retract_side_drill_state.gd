@@ -4,8 +4,10 @@ class_name PlayerRetractSideDrillState
 # DONE
 
 @onready var animated_sprite : AnimatedSprite2D = $"../../AnimatedSprite"
+@onready var player : Player = $"../../../Player"
 
 func enter():
+	player.prepare_for_drilling_down()
 	animated_sprite.play("retract_side_drill")
 	
 func exit():

@@ -4,13 +4,25 @@ class_name PlayerDrillSideState
 # NOT DONE AND IMPLEMENTED
 
 @onready var animated_sprite : AnimatedSprite2D = $"../../AnimatedSprite"
+@onready var player : Player = $"../../../Player"
 
 func enter():
 	animated_sprite.play("drill_side")
+	player.start_drilling(Player.DrillDirection.SIDE)
 	
 func exit():
 	pass
 
-# TODO: Needs logic once actual drilling is implemented. 
 func update(_delta):
-	pass
+	if !player.drilling:
+		var up = Input.is_action_pressed("move_up")
+		var down = Input.is_action_pressed("move_down")
+		
+		# TODO: add functionality to drill again immediately
+		if up:
+			transitioned.emit(self, "ExtendPropellerSideDrill")
+		elif down: 
+			transitioned.emit(self, "RetractSideDrill")
+		else:
+			transitioned.emit(self, "Idle")
+	

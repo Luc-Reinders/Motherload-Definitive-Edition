@@ -4,6 +4,7 @@ class_name PlayerMoveState
 # HALF DONE
 
 @onready var animated_sprite : AnimatedSprite2D = $"../../AnimatedSprite"
+@onready var player : Player = $"../../../Player"
 
 func enter():
 	animated_sprite.play("move")
@@ -21,17 +22,21 @@ func update(_delta):
 	
 	if up:
 		transitioned.emit(self, "ExtendPropellerSideDrill")
-	elif down: # TODO: Maybe slow down a bit before you are allowed to drill down
+	elif down: # TODO: Movement speed need to be slow before you are allowed to drill down
 		transitioned.emit(self, "RetractSideDrill")
-	else:
-		# Handle grounded turns
-		if right and not animated_sprite.flip_h:
+	elif right:
+		if not animated_sprite.flip_h: # Handle turn from left to right
 			animated_sprite.flip_h = true
 			transitioned.emit(self, "TurnGround")
-		elif left and animated_sprite.flip_h:
+		elif player.is_on_wall() and player.is_on_floor():
+			transitioned.emit(self, "DrillSide")
+	elif left:
+		if animated_sprite.flip_h: # Handle turn from right to left
 			animated_sprite.flip_h = false
 			transitioned.emit(self, "TurnGround")
-		# TODO: check if standing still when adding acceleration
-		elif not right and not left: 
-			transitioned.emit(self, "Idle")
+		elif player.is_on_wall() and player.is_on_floor(): 
+			transitioned.emit(self, "DrillSide")
+	else:
+		# TODO: due to acceleration, pod may be moving even if no buttons are pressed
+		transitioned.emit(self, "Idle")
 		

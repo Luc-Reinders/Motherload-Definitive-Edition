@@ -10,20 +10,17 @@ enum TileTransform {
 	ROTATE_270 = TileSetAtlasSource.TRANSFORM_TRANSPOSE | TileSetAtlasSource.TRANSFORM_FLIP_V,
 }
 
-func _ready():
-	for y in range(-6, 6):
-		for x in range(-11, 11):
-			set_appropriate_cave_texture(Vector2i(x,y))
-
 ## We are using atlas coordinates to identify cells. This function is a shortcut
 func get_tile(cell: Vector2i) -> Vector2i:
 	return get_cell_atlas_coords(cell)
 
 ## Shorthand function: The source id for all tiles is the same since all tiles 
 ## share the same sprite sheet. 
-func set_tile(coords: Vector2i, atlas_coords: Vector2i, alternative_tile: int = 0) -> void:
-	set_cell(coords, TILE_SOURCE_ID, atlas_coords, alternative_tile)
+func set_tile(cell: Vector2i, atlas_coords: Vector2i, alternative_tile: int = 0) -> void:
+	set_cell(cell, TILE_SOURCE_ID, atlas_coords, alternative_tile)
 
+func is_full_tile(cell: Vector2i) -> bool:
+	return Tiles.is_full_tile(get_tile(cell))
 
 
 ## If the given tile is empty, it will set this tile to the appropriate cave 
@@ -31,7 +28,9 @@ func set_tile(coords: Vector2i, atlas_coords: Vector2i, alternative_tile: int = 
 func set_appropriate_cave_texture(cell: Vector2i) -> void:
 	var tile: Vector2i = get_cell_atlas_coords(cell)
 	
-	if Tiles.is_full_tile(tile):
+	if cell.y < 0: # Cell is above ground
+		return
+	if Tiles.is_full_tile(tile): 
 		return
 	
 	var bitmask : Array[bool] = obtain_neighbor_bit_mask(cell)
@@ -158,7 +157,13 @@ func set_appropriate_cave_texture(cell: Vector2i) -> void:
 		set_tile(cell, Tiles.CAVE13, TileTransform.ROTATE_270)
 
 
-
+## Updates the cave textures of this cell and its neighboring cells 
+func set_appropriate_cave_textures_3x3(cell: Vector2i) -> void:
+	var neighbors: Array[Vector2i] = get_neighboring_cells(cell)
+	
+	set_appropriate_cave_texture(cell)
+	for neighbor in neighbors:
+		set_appropriate_cave_texture(neighbor)
 
 
 ## Gets adjacent and diagonal neighbor cells sorted in clock-wise order starting
@@ -190,3 +195,17 @@ func obtain_neighbor_bit_mask(cell: Vector2i) -> Array[bool]:
 		bit_mask.append(Tiles.is_full_tile(get_cell_atlas_coords(neighbor_cell)))
 	
 	return bit_mask
+
+
+func set_half_dug(cell: Vector2i, drill_direction: Player.DrillDirection, facing_right: bool) -> void:
+	if drill_direction == Player.DrillDirection.DOWN:
+		set_tile(cell, Tiles.HALF_DUG, TileTransform.ROTATE_90)
+		set_appropriate_cave_texture(cell + Vector2i(0, -1)) 
+	elif facing_right: # Player is drilling to the right
+		set_tile(cell, Tiles.HALF_DUG, TileTransform.ROTATE_0)
+		set_appropriate_cave_texture(cell + Vector2i(-1, 0)) 
+	else: # Player is drilling to the left
+		set_tile(cell, Tiles.HALF_DUG, TileTransform.ROTATE_180)
+		set_appropriate_cave_texture(cell + Vector2i(1, 0)) 
+		
+		
