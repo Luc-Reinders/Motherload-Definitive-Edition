@@ -13,6 +13,10 @@ enum TileTransform {
 }
 
 
+func _ready():
+	generate()
+
+
 
 @export var generator: EarthGenerator
 func generate() -> void:
