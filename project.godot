@@ -15,6 +15,13 @@ run/main_scene="uid://dumnvke81t2xa"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
+[display]
+
+window/size/viewport_width=552
+window/size/viewport_height=401
+window/size/mode=2
+window/stretch/mode="canvas_items"
+
 [input]
 
 move_right={

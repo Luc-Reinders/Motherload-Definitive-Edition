@@ -721,7 +721,6 @@ position = Vector2(0, -8)
 sprite_frames = SubResource("SpriteFrames_31cv2")
 animation = &"move"
 autoplay = "idle"
-frame_progress = 0.73559946
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1317438549]
 shape = SubResource("CapsuleShape2D_kft7l")
@@ -789,6 +788,10 @@ metadata/_custom_type_script = "uid://dqeramwaqlydv"
 [node name="DrillSide" type="Node" parent="State Machine" unique_id=1912266988]
 script = ExtResource("15_oprun")
 metadata/_custom_type_script = "uid://cgqdsq70hynhh"
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1300423187]
+process_callback = 0
+position_smoothing_enabled = true
 
 [connection signal="animation_finished" from="AnimatedSprite" to="State Machine/TurnGround" method="_on_animated_sprite_animation_finished"]
 [connection signal="animation_finished" from="AnimatedSprite" to="State Machine/TurnFlight" method="_on_animated_sprite_animation_finished"]
