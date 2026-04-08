@@ -1,9 +1,7 @@
 extends State
 class_name PlayerRetractBottomDrillState
 
-# DONE
-
-@onready var animated_sprite : AnimatedSprite2D = $"../../AnimatedSprite"
+@export var animated_sprite : AnimatedSprite2D
 
 func enter():
 	animated_sprite.play("retract_bottom_drill")

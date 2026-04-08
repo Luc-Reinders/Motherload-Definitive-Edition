@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cgffgcwqawfu6"]
 
-[ext_resource type="Script" uid="uid://ce41wqlbkgy4n" path="res://scripts/player/player.gd" id="1_g2els"]
+[ext_resource type="Script" uid="uid://ce41wqlbkgy4n" path="res://scripts/player/player.gd" id="1_fulsm"]
 [ext_resource type="Texture2D" uid="uid://casbr08nhbpbd" path="res://assets/sprites/Pod Horizontally Centered Spritesheet.png" id="2_fulsm"]
 [ext_resource type="Script" uid="uid://df3uth6l1lnrg" path="res://scripts/states/state_machine.gd" id="3_qhqgy"]
 [ext_resource type="Script" uid="uid://ljoqflgiu2ep" path="res://scripts/states/player_idle_state.gd" id="4_dqkch"]
@@ -714,7 +714,7 @@ radius = 15.0
 height = 34.0
 
 [node name="Player" type="CharacterBody2D" unique_id=25987061]
-script = ExtResource("1_g2els")
+script = ExtResource("1_fulsm")
 
 [node name="AnimatedSprite" type="AnimatedSprite2D" parent="." unique_id=1141550430]
 position = Vector2(0, -8)
@@ -729,64 +729,84 @@ shape = SubResource("CapsuleShape2D_kft7l")
 script = ExtResource("3_qhqgy")
 initial_state = NodePath("Idle")
 
-[node name="Idle" type="Node" parent="State Machine" unique_id=98115100]
+[node name="Idle" type="Node" parent="State Machine" unique_id=98115100 node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("4_dqkch")
+animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://ljoqflgiu2ep"
 
-[node name="Move" type="Node" parent="State Machine" unique_id=475364052]
+[node name="Move" type="Node" parent="State Machine" unique_id=475364052 node_paths=PackedStringArray("animated_sprite", "player")]
 script = ExtResource("5_qlg0r")
+animated_sprite = NodePath("../../AnimatedSprite")
+player = NodePath("../..")
 metadata/_custom_type_script = "uid://jcy3vsg5ofdi"
 
-[node name="Flight" type="Node" parent="State Machine" unique_id=197385124]
+[node name="Flight" type="Node" parent="State Machine" unique_id=197385124 node_paths=PackedStringArray("player", "animated_sprite")]
 script = ExtResource("6_tuyoq")
+player = NodePath("../..")
+animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://l7h2c6evy4tw"
 
-[node name="TurnGround" type="Node" parent="State Machine" unique_id=1714789884]
+[node name="TurnGround" type="Node" parent="State Machine" unique_id=1714789884 node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("7_fjrip")
+animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://b7xsjy0jicfb4"
 
-[node name="TurnFlight" type="Node" parent="State Machine" unique_id=1750959808]
+[node name="TurnFlight" type="Node" parent="State Machine" unique_id=1750959808 node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("8_smehm")
+animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://cwqnlyw6g1wul"
 
-[node name="ExtendPropellerSideDrill" type="Node" parent="State Machine" unique_id=291786556]
+[node name="ExtendPropellerSideDrill" type="Node" parent="State Machine" unique_id=291786556 node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("9_ur7pv")
+animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://db2spkowjmd28"
 
-[node name="ExtendPropellerBottomDrill" type="Node" parent="State Machine" unique_id=1030469369]
+[node name="ExtendPropellerBottomDrill" type="Node" parent="State Machine" unique_id=1030469369 node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("10_a8ls1")
+animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://cg4w2q7gwyjkw"
 
-[node name="RetractPropellerBottomDrill" type="Node" parent="State Machine" unique_id=1656981421]
+[node name="RetractPropellerBottomDrill" type="Node" parent="State Machine" unique_id=1656981421 node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("11_fulsm")
+animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://croe55j57d1dk"
 
-[node name="RetractPropellerSideDrill" type="Node" parent="State Machine" unique_id=1346264747]
+[node name="RetractPropellerSideDrill" type="Node" parent="State Machine" unique_id=1346264747 node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("12_4r5pv")
+animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://bwi5ofc026ba2"
 
-[node name="RetractSideDrill" type="Node" parent="State Machine" unique_id=1022947321]
+[node name="RetractSideDrill" type="Node" parent="State Machine" unique_id=1022947321 node_paths=PackedStringArray("animated_sprite", "player")]
 script = ExtResource("10_y4r1p")
+animated_sprite = NodePath("../../AnimatedSprite")
+player = NodePath("../..")
 metadata/_custom_type_script = "uid://bwyqgpwklxc3y"
 
-[node name="RetractBottomDrill" type="Node" parent="State Machine" unique_id=710043150]
+[node name="RetractBottomDrill" type="Node" parent="State Machine" unique_id=710043150 node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("11_d2wvv")
+animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://bj8r36uwv33ja"
 
-[node name="ExtendSideDrill" type="Node" parent="State Machine" unique_id=1198767032]
+[node name="ExtendSideDrill" type="Node" parent="State Machine" unique_id=1198767032 node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("13_oprun")
+animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://8fy2gffcfkrk"
 
-[node name="ExtendBottomDrill" type="Node" parent="State Machine" unique_id=1220652867]
+[node name="ExtendBottomDrill" type="Node" parent="State Machine" unique_id=1220652867 node_paths=PackedStringArray("animated_sprite")]
 script = ExtResource("12_f1ej7")
+animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://df3eqj7as3spd"
 
-[node name="DrillDown" type="Node" parent="State Machine" unique_id=1128010573]
+[node name="DrillDown" type="Node" parent="State Machine" unique_id=1128010573 node_paths=PackedStringArray("animated_sprite", "player")]
 script = ExtResource("14_a8ls1")
+animated_sprite = NodePath("../../AnimatedSprite")
+player = NodePath("../..")
 metadata/_custom_type_script = "uid://dqeramwaqlydv"
 
-[node name="DrillSide" type="Node" parent="State Machine" unique_id=1912266988]
+[node name="DrillSide" type="Node" parent="State Machine" unique_id=1912266988 node_paths=PackedStringArray("animated_sprite", "player")]
 script = ExtResource("15_oprun")
+animated_sprite = NodePath("../../AnimatedSprite")
+player = NodePath("../..")
 metadata/_custom_type_script = "uid://cgqdsq70hynhh"
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1300423187]

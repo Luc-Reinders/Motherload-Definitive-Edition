@@ -16,4 +16,4 @@ generator = NodePath("FlashEarthGenerator")
 script = ExtResource("3_4i2ti")
 
 [node name="Player" parent="." unique_id=25987061 instance=ExtResource("4_mfdnj")]
-position = Vector2(-1, -28)
+position = Vector2(0, -38)

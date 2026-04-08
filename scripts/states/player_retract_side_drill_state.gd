@@ -1,10 +1,8 @@
 extends State
 class_name PlayerRetractSideDrillState
 
-# DONE
-
-@onready var animated_sprite : AnimatedSprite2D = $"../../AnimatedSprite"
-@onready var player : Player = $"../../../Player"
+@export var animated_sprite : AnimatedSprite2D 
+@export var player : Player
 
 func enter():
 	player.prepare_for_drilling_down()

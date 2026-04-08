@@ -1,10 +1,8 @@
 extends State
 class_name PlayerFlightState
 
-# HALF DONE
-
-@onready var player : Player = $"../../../Player"
-@onready var animated_sprite : AnimatedSprite2D = $"../../AnimatedSprite"
+@export var player : Player
+@export var animated_sprite : AnimatedSprite2D
 
 func enter():
 	animated_sprite.play("flight")
