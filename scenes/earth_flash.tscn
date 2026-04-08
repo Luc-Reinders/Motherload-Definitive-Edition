@@ -1,0 +1,7 @@
+[gd_scene format=3 uid="uid://5fff2iprddre"]
+
+[ext_resource type="PackedScene" uid="uid://iioow7wbouvb" path="res://scenes/earth_abstract.tscn" id="1_yt1in"]
+[ext_resource type="Script" uid="uid://bjqdl0r56ei1w" path="res://scripts/earth/earth_flash.gd" id="2_p7vrr"]
+
+[node name="EarthFlash" unique_id=643595024 instance=ExtResource("1_yt1in")]
+script = ExtResource("2_p7vrr")

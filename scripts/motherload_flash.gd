@@ -35,6 +35,7 @@ static func get_collectable_from_tile(tile: Vector2i) -> Collectable:
 
 
 
+
 # Defining pod components (upgrades)
 
 static var STOCK_DRILL: Drill = Drill.new("Stock Drill", 0, 2)
@@ -94,3 +95,16 @@ static var TITANIC_BAY: Bay = Bay.new("Titanic Bay", 20000, 70)
 static var LEVIATHAN_BAY: Bay = Bay.new("Leviathan Bay", 100000, 120)
 # Array for easy access
 static var BAY_UPGRADES: Array[Bay] = [MICRO_BAY, MEDIUM_BAY, HUGE_BAY, GIGANTIC_BAY, TITANIC_BAY, LEVIATHAN_BAY]
+
+
+
+
+
+# Defining Items 
+
+static var RESERVE_TANK_FUEL: Item = Item.new("Reserve Tank Fuel", 2000)
+static var HULL_REPAIR_NANOBOTS: Item = Item.new("Hull Repair Nanobots", 7500)
+static var DYNAMITE: Item = Item.new("Dynamite", 2000)
+static var PLASTIC_EXPLOSIVES: Item = Item.new("Plastic Explosives", 5000)
+static var QUANTUM_TELEPORTER: Item = Item.new("Quantum Teleporter", 2000)
+static var MATTER_TRANSMITTER: Item = Item.new("Matter Transmitter", 10000)

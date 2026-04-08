@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cgffgcwqawfu6"]
 
-[ext_resource type="Script" uid="uid://ce41wqlbkgy4n" path="res://scripts/player/player.gd" id="1_fulsm"]
+[ext_resource type="Script" uid="uid://ce41wqlbkgy4n" path="res://scripts/player/player_abstract.gd" id="1_fulsm"]
 [ext_resource type="Texture2D" uid="uid://casbr08nhbpbd" path="res://assets/sprites/Pod Horizontally Centered Spritesheet.png" id="2_fulsm"]
 [ext_resource type="Script" uid="uid://df3uth6l1lnrg" path="res://scripts/states/state_machine.gd" id="3_qhqgy"]
 [ext_resource type="Script" uid="uid://ljoqflgiu2ep" path="res://scripts/states/player_idle_state.gd" id="4_dqkch"]
@@ -713,7 +713,7 @@ animations = [{
 radius = 15.0
 height = 34.0
 
-[node name="Player" type="CharacterBody2D" unique_id=25987061]
+[node name="PlayerAbstract" type="CharacterBody2D" unique_id=25987061]
 script = ExtResource("1_fulsm")
 
 [node name="AnimatedSprite" type="AnimatedSprite2D" parent="." unique_id=1141550430]
@@ -734,16 +734,14 @@ script = ExtResource("4_dqkch")
 animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://ljoqflgiu2ep"
 
-[node name="Move" type="Node" parent="State Machine" unique_id=475364052 node_paths=PackedStringArray("animated_sprite", "player")]
+[node name="Move" type="Node" parent="State Machine" unique_id=475364052 node_paths=PackedStringArray("player")]
 script = ExtResource("5_qlg0r")
-animated_sprite = NodePath("../../AnimatedSprite")
 player = NodePath("../..")
 metadata/_custom_type_script = "uid://jcy3vsg5ofdi"
 
-[node name="Flight" type="Node" parent="State Machine" unique_id=197385124 node_paths=PackedStringArray("player", "animated_sprite")]
+[node name="Flight" type="Node" parent="State Machine" unique_id=197385124 node_paths=PackedStringArray("player")]
 script = ExtResource("6_tuyoq")
 player = NodePath("../..")
-animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://l7h2c6evy4tw"
 
 [node name="TurnGround" type="Node" parent="State Machine" unique_id=1714789884 node_paths=PackedStringArray("animated_sprite")]
@@ -776,9 +774,8 @@ script = ExtResource("12_4r5pv")
 animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://bwi5ofc026ba2"
 
-[node name="RetractSideDrill" type="Node" parent="State Machine" unique_id=1022947321 node_paths=PackedStringArray("animated_sprite", "player")]
+[node name="RetractSideDrill" type="Node" parent="State Machine" unique_id=1022947321 node_paths=PackedStringArray("player")]
 script = ExtResource("10_y4r1p")
-animated_sprite = NodePath("../../AnimatedSprite")
 player = NodePath("../..")
 metadata/_custom_type_script = "uid://bwyqgpwklxc3y"
 
@@ -797,15 +794,13 @@ script = ExtResource("12_f1ej7")
 animated_sprite = NodePath("../../AnimatedSprite")
 metadata/_custom_type_script = "uid://df3eqj7as3spd"
 
-[node name="DrillDown" type="Node" parent="State Machine" unique_id=1128010573 node_paths=PackedStringArray("animated_sprite", "player")]
+[node name="DrillDown" type="Node" parent="State Machine" unique_id=1128010573 node_paths=PackedStringArray("player")]
 script = ExtResource("14_a8ls1")
-animated_sprite = NodePath("../../AnimatedSprite")
 player = NodePath("../..")
 metadata/_custom_type_script = "uid://dqeramwaqlydv"
 
-[node name="DrillSide" type="Node" parent="State Machine" unique_id=1912266988 node_paths=PackedStringArray("animated_sprite", "player")]
+[node name="DrillSide" type="Node" parent="State Machine" unique_id=1912266988 node_paths=PackedStringArray("player")]
 script = ExtResource("15_oprun")
-animated_sprite = NodePath("../../AnimatedSprite")
 player = NodePath("../..")
 metadata/_custom_type_script = "uid://cgqdsq70hynhh"
 

@@ -1,11 +1,10 @@
 extends State
 class_name PlayerFlightState
 
-@export var player : Player
-@export var animated_sprite : AnimatedSprite2D
+@export var player : PlayerAbstract
 
 func enter():
-	animated_sprite.play("flight")
+	player.animated_sprite.play("flight")
 	
 func exit():
 	pass
@@ -24,10 +23,10 @@ func update(_delta):
 			transitioned.emit(self, "RetractPropellerSideDrill")
 	else:
 		# Handle airborn turns
-		if right and not animated_sprite.flip_h:
-			animated_sprite.flip_h = true
+		if right and not player.is_facing_right():
+			player.face_right()
 			transitioned.emit(self, "TurnFlight")
-		elif left and animated_sprite.flip_h:
-			animated_sprite.flip_h = false
+		elif left and player.is_facing_right():
+			player.face_left()
 			transitioned.emit(self, "TurnFlight")
 		

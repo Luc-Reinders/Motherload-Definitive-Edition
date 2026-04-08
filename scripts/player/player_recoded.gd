@@ -1,0 +1,2 @@
+extends PlayerAbstract
+class_name PlayerRecoded

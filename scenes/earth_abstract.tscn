@@ -1,10 +1,10 @@
 [gd_scene format=3 uid="uid://iioow7wbouvb"]
 
-[ext_resource type="Texture2D" uid="uid://dr447ifct57bv" path="res://assets/sprites/TileSpriteSheetReordered.png" id="1_2umt7"]
-[ext_resource type="Script" uid="uid://dg2dsjesdk68w" path="res://scripts/earth/earth.gd" id="1_afhwv"]
+[ext_resource type="Texture2D" uid="uid://dr447ifct57bv" path="res://assets/sprites/TileSpriteSheetReordered.png" id="1_qo17n"]
+[ext_resource type="Script" uid="uid://dg2dsjesdk68w" path="res://scripts/earth/earth_abstract.gd" id="2_dmnu2"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_2tfwh"]
-texture = ExtResource("1_2umt7")
+texture = ExtResource("1_qo17n")
 texture_region_size = Vector2i(50, 50)
 1:0/0 = 0
 1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-25, -25, 25, -25, 25, 25, -25, 25)
@@ -95,6 +95,6 @@ tile_size = Vector2i(50, 50)
 physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_2tfwh")
 
-[node name="Earth" type="TileMapLayer" unique_id=643595024]
+[node name="AbstractEarth" type="TileMapLayer" unique_id=643595024]
 tile_set = SubResource("TileSet_k5w1d")
-script = ExtResource("1_afhwv")
+script = ExtResource("2_dmnu2")

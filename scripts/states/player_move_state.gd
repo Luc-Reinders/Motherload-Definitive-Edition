@@ -1,11 +1,10 @@
 extends State
 class_name PlayerMoveState
 
-@export var animated_sprite : AnimatedSprite2D
-@export var player : Player
+@export var player : PlayerAbstract
 
 func enter():
-	animated_sprite.play("move")
+	player.animated_sprite.play("move")
 	
 func exit():
 	pass
@@ -23,14 +22,14 @@ func update(_delta):
 	elif down: # TODO: Movement speed need to be slow before you are allowed to drill down
 		transitioned.emit(self, "RetractSideDrill")
 	elif right:
-		if not animated_sprite.flip_h: # Handle turn from left to right
-			animated_sprite.flip_h = true
+		if not player.is_facing_right(): # Handle turn from left to right
+			player.face_right()
 			transitioned.emit(self, "TurnGround")
 		elif player.is_on_wall() and player.is_on_floor():
 			transitioned.emit(self, "DrillSide")
 	elif left:
-		if animated_sprite.flip_h: # Handle turn from right to left
-			animated_sprite.flip_h = false
+		if player.is_facing_right(): # Handle turn from right to left
+			player.face_left()
 			transitioned.emit(self, "TurnGround")
 		elif player.is_on_wall() and player.is_on_floor(): 
 			transitioned.emit(self, "DrillSide")

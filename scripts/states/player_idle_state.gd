@@ -1,8 +1,6 @@
 extends State
 class_name PlayerIdleState
 
-# DONE
-
 @export var animated_sprite : AnimatedSprite2D
 
 func enter():
