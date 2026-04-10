@@ -6,19 +6,11 @@ enum DrillDirection {
 	DOWN
 }
 
-const X_FRICTION = 400.0
-const GRAVITY = 400.0
-
-const MAX_X_ACCEL = 800.0
-const MAX_Y_ACCEL = 800.0
-
-const MAX_X_VELOCITY = 300.0
-const MAX_Y_VELOCITY = 300.0
-
-const MAX_DRILL_VELOCITY = 50.0
+# TODO: rename all propeller variables/animations to "rotor"
 
 @onready var animated_sprite : AnimatedSprite2D = $AnimatedSprite
 @onready var collision_shape : CollisionShape2D = $CollisionShape2D
+@onready var state_machine: StateMachine = $"State Machine"
 @export var earth : EarthAbstract # TODO: Remove as export and make an argument in methods?
 
 @export var pod_mass: int # Mass in Decakilograms (1980 kgs becomes 198)
@@ -50,6 +42,10 @@ func calculate_bay_space() -> int:
 	return s
 
 
+# Other variables
+var steam_count: int = 0 # Represents rate of steam particles that need to be emitted
+var rotor_speed: float = 0 # Used in the animation speed of the flying animation
+
 # Drilling logic variables
 var _drilling: bool = false
 var _drilling_direction: DrillDirection
@@ -59,10 +55,16 @@ var _drilling_target_global_pos: Vector2
 var _preparing_drilling_down: bool = false
 var _drilling_initial_target_diff: Vector2
 
-
-
 func is_drilling() -> bool:
 	return _drilling
+
+
+
+var _turning: bool = false
+
+func is_turning() -> bool:
+	return _turning
+
 
 ## Returns whether the player is facing right. DOES NOT WORK WITH TURNING!
 func is_facing_right() -> bool:
@@ -145,79 +147,14 @@ func finish_drilling() -> void:
 
 
 
+@warning_ignore("unused_parameter")
 func _physics_process(delta: float) -> void:
-	
-	# Drilling --------------------------------------------------------------
-	if _drilling:
-		# TODO: There is some duplicate code between the drilling down and sideways. Can't be
-		# bothered to fix it now xd
-		
-		if _drilling_direction == DrillDirection.DOWN:
-			var diff_y = _drilling_target_global_pos.y - global_position.y
-			if diff_y > 0: # Player has not yet reached the target y
-				velocity.y = MAX_DRILL_VELOCITY
-			
-				# Calculate drilling progress between 0 and 1
-				var init_diff_y = _drilling_initial_target_diff.y
-				var drilling_progress_y = (init_diff_y - diff_y) / init_diff_y
-			
-				# Set x position based on drilling progress
-				var init_diff_x = _drilling_initial_target_diff.x
-				var target_pos_x = _drilling_target_global_pos.x
-				var init_start_x = target_pos_x - init_diff_x
-				global_position.x = init_start_x + init_diff_x * drilling_progress_y
-			
-				# Set dug dirt texture when at least halfway through drilling
-				if drilling_progress_y >= 0.5:
-					earth.set_half_dug(_drilling_target_cell, _drilling_direction, is_facing_right())
-			else: # Player is at least as deep as the target y
-				finish_drilling()
-		elif _drilling_direction == DrillDirection.SIDE:
-			var diff_x: float
-			if is_facing_right(): # Drilling right
-				diff_x = _drilling_target_global_pos.x - global_position.x
-			else: # Drilling to the left
-				diff_x = global_position.x - _drilling_target_global_pos.x
-			
-			if diff_x > 0:
-				if is_facing_right(): # Facing right
-					velocity.x = MAX_DRILL_VELOCITY
-				else: # Facing left
-					velocity.x = -MAX_DRILL_VELOCITY
-				
-				# Calculate drilling progress between 0 and 1
-				var init_diff_x = abs(_drilling_initial_target_diff.x)
-				var drilling_progress_x = (init_diff_x - diff_x) / init_diff_x
-				
-				# Set dug dirt texture when at least halfway through drilling
-				if drilling_progress_x >= 0.5:
-					earth.set_half_dug(_drilling_target_cell, _drilling_direction, is_facing_right())
-			else:
-				finish_drilling() 
-	
-	# Manual movement -------------------------------------------------------
-	elif not _preparing_drilling_down:
-		# Vertical Movement ----------------------------------
-		if Input.is_action_pressed("move_up"):
-			velocity.y += (GRAVITY - MAX_Y_ACCEL) * delta
-		elif not is_on_floor():
-			velocity.y += GRAVITY * delta
+	push_error("Physics process needs to be overridden for movement!!!")
 
-		# Horizontal Movement --------------------------------
-	
-		# Get the input direction: -1 = left, 0 = neutral, 1 = right
-		var direction := Input.get_axis("move_left", "move_right")
-	
-		if direction:
-			velocity.x += (MAX_X_ACCEL - X_FRICTION) * direction * delta
-		else:
-			velocity.x = move_toward(velocity.x, 0, X_FRICTION * delta)
 
-	# clamp velocities
-	velocity.y = clamp(velocity.y, -MAX_Y_VELOCITY, MAX_Y_VELOCITY)
-	velocity.x = clamp(velocity.x, -MAX_X_VELOCITY, MAX_X_VELOCITY)
-	
-	move_and_slide()
+
+
+
 
 
 # Drilling debugging

@@ -15,25 +15,32 @@ func update(_delta):
 	var up = Input.is_action_pressed("move_up")
 	var down = Input.is_action_pressed("move_down")
 	
-	# TODO: Once drilling is implemented, add transition to side drill state
+	# Update animation speed depending on x velocity. This formula is based on the decompiled
+	# code from flash Motherload.
+	player.animated_sprite.speed_scale = (4.0 * player.velocity.x) / 5.0
 	
 	if up:
-		transitioned.emit(self, "ExtendPropellerSideDrill")
+		go_to_state("ExtendPropellerSideDrill")
 	elif down: # TODO: Movement speed need to be slow before you are allowed to drill down
-		transitioned.emit(self, "RetractSideDrill")
+		go_to_state("RetractSideDrill")
 	elif right:
-		if not player.is_facing_right(): # Handle turn from left to right
+		if not player.is_facing_right() and player.velocity.x > 0: 
+			# Turn right
 			player.face_right()
-			transitioned.emit(self, "TurnGround")
+			go_to_state("TurnGround")
 		elif player.is_on_wall() and player.is_on_floor():
-			transitioned.emit(self, "DrillSide")
+			go_to_state("DrillSide")
 	elif left:
-		if player.is_facing_right(): # Handle turn from right to left
+		if player.is_facing_right() and player.velocity.x < 0:
+			# Turn left
 			player.face_left()
-			transitioned.emit(self, "TurnGround")
+			go_to_state("TurnGround")
 		elif player.is_on_wall() and player.is_on_floor(): 
-			transitioned.emit(self, "DrillSide")
-	else:
-		# TODO: due to acceleration, pod may be moving even if no buttons are pressed
-		transitioned.emit(self, "Idle")
-		
+			go_to_state("DrillSide")
+	elif player.velocity.x == 0:
+		go_to_state("Idle")
+
+
+func go_to_state(state_name: String):
+	player.animated_sprite.speed_scale = 1
+	transitioned.emit(self, state_name)

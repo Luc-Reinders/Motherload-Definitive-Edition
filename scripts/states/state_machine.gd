@@ -1,4 +1,5 @@
 extends Node
+class_name StateMachine
 
 @export var initial_state : State
 
@@ -6,7 +7,7 @@ var current_state : State
 var states: Dictionary = {}
 
 # Initialize all children and connect transition signals
-func _ready() -> void:	
+func _ready() -> void:
 	for child in get_children():
 		if child is State:
 			states[child.name.to_lower()] = child
@@ -39,3 +40,14 @@ func on_child_transition(state, new_state_name):
 		current_state.exit()
 	new_state.enter()
 	current_state = new_state
+
+
+func get_state_by_name(state_name: String) -> State:
+	return states.get(state_name.to_lower())
+
+## Checks whether the current state is equal to any state with the same name as in the array
+func is_current_any(state_names: Array[String]) -> bool:
+	for state_name in state_names:
+		if state_name.to_lower() == current_state.name.to_lower():
+			return true
+	return false

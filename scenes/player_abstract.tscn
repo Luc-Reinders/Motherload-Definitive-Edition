@@ -384,7 +384,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"drill_down",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -401,7 +401,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"drill_side",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -418,7 +418,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"extend_bottom_drill",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -444,7 +444,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"extend_propeller_bottom_drill",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -482,7 +482,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"extend_propeller_side_drill",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -505,7 +505,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"extend_side_drill",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -525,7 +525,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"flight",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -533,7 +533,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"idle",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -562,7 +562,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"move",
-"speed": 60.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -579,7 +579,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"retract_bottom_drill",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -605,7 +605,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"retract_propeller_bottom_drill",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -643,7 +643,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"retract_propeller_side_drill",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -666,7 +666,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"retract_side_drill",
-"speed": 20.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -686,7 +686,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"turn_flight",
-"speed": 10.0
+"speed": 24.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -706,7 +706,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"turn_ground",
-"speed": 10.0
+"speed": 24.0
 }]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kft7l"]
@@ -719,7 +719,7 @@ script = ExtResource("1_fulsm")
 [node name="AnimatedSprite" type="AnimatedSprite2D" parent="." unique_id=1141550430]
 position = Vector2(0, -8)
 sprite_frames = SubResource("SpriteFrames_31cv2")
-animation = &"move"
+animation = &"turn_ground"
 autoplay = "idle"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1317438549]
@@ -744,14 +744,14 @@ script = ExtResource("6_tuyoq")
 player = NodePath("../..")
 metadata/_custom_type_script = "uid://l7h2c6evy4tw"
 
-[node name="TurnGround" type="Node" parent="State Machine" unique_id=1714789884 node_paths=PackedStringArray("animated_sprite")]
+[node name="TurnGround" type="Node" parent="State Machine" unique_id=1714789884 node_paths=PackedStringArray("player")]
 script = ExtResource("7_fjrip")
-animated_sprite = NodePath("../../AnimatedSprite")
+player = NodePath("../..")
 metadata/_custom_type_script = "uid://b7xsjy0jicfb4"
 
-[node name="TurnFlight" type="Node" parent="State Machine" unique_id=1750959808 node_paths=PackedStringArray("animated_sprite")]
+[node name="TurnFlight" type="Node" parent="State Machine" unique_id=1750959808 node_paths=PackedStringArray("player")]
 script = ExtResource("8_smehm")
-animated_sprite = NodePath("../../AnimatedSprite")
+player = NodePath("../..")
 metadata/_custom_type_script = "uid://cwqnlyw6g1wul"
 
 [node name="ExtendPropellerSideDrill" type="Node" parent="State Machine" unique_id=291786556 node_paths=PackedStringArray("animated_sprite")]

@@ -1,24 +1,24 @@
 extends Node2D
 
 # Defining minerals
-static var IRONIUM: Collectable = Collectable.new("Ironium", 30, 10, Collectable.CollectableType.MINERAL)
-static var BRONZIUM: Collectable = Collectable.new("Bronzium", 60, 10, Collectable.CollectableType.MINERAL)
-static var SILVERIUM: Collectable = Collectable.new("Silverium", 100, 10, Collectable.CollectableType.MINERAL)
-static var GOLDIUM: Collectable = Collectable.new("Goldium", 250, 20, Collectable.CollectableType.MINERAL)
-static var PLATINIUM: Collectable = Collectable.new("Platinium", 750, 30, Collectable.CollectableType.MINERAL)
-static var EINSTEINIUM: Collectable = Collectable.new("Einsteinium", 2000, 40, Collectable.CollectableType.MINERAL)
-static var EMERALD: Collectable = Collectable.new("Emerald", 5000, 60, Collectable.CollectableType.MINERAL)
-static var RUBY: Collectable = Collectable.new("Ruby", 20000, 80, Collectable.CollectableType.MINERAL)
-static var DIAMOND: Collectable = Collectable.new("Diamond", 100000, 100, Collectable.CollectableType.MINERAL)
-static var AMAZONITE: Collectable = Collectable.new("Amazonite", 500000, 120, Collectable.CollectableType.MINERAL)
+static var IRONIUM: Collectable = Collectable.new("Ironium", 30, 1, Collectable.CollectableType.MINERAL)
+static var BRONZIUM: Collectable = Collectable.new("Bronzium", 60, 1, Collectable.CollectableType.MINERAL)
+static var SILVERIUM: Collectable = Collectable.new("Silverium", 100, 1, Collectable.CollectableType.MINERAL)
+static var GOLDIUM: Collectable = Collectable.new("Goldium", 250, 2, Collectable.CollectableType.MINERAL)
+static var PLATINIUM: Collectable = Collectable.new("Platinium", 750, 3, Collectable.CollectableType.MINERAL)
+static var EINSTEINIUM: Collectable = Collectable.new("Einsteinium", 2000, 4, Collectable.CollectableType.MINERAL)
+static var EMERALD: Collectable = Collectable.new("Emerald", 5000, 6, Collectable.CollectableType.MINERAL)
+static var RUBY: Collectable = Collectable.new("Ruby", 20000, 8, Collectable.CollectableType.MINERAL)
+static var DIAMOND: Collectable = Collectable.new("Diamond", 100000, 10, Collectable.CollectableType.MINERAL)
+static var AMAZONITE: Collectable = Collectable.new("Amazonite", 500000, 12, Collectable.CollectableType.MINERAL)
 # Array for easy access
 static var MINERALS: Array[Collectable] = [IRONIUM, BRONZIUM, SILVERIUM, GOLDIUM, PLATINIUM, EINSTEINIUM, EMERALD, RUBY, DIAMOND, AMAZONITE]
 
 # Defining artifacts
-static var DINOSAUR_BONES: Collectable = Collectable.new("Dinosaur Bones", 1000, -1, Collectable.CollectableType.ARTIFACT)
-static var TREASURE: Collectable = Collectable.new("Treasure", 5000, -1, Collectable.CollectableType.ARTIFACT)
-static var MARTIAN_SKELETON: Collectable = Collectable.new("Martian Skeleton", 10000, -1, Collectable.CollectableType.ARTIFACT)
-static var RELIGIOUS_ARTIFACT: Collectable = Collectable.new("Religious Artifact", 50000, -1, Collectable.CollectableType.ARTIFACT)
+static var DINOSAUR_BONES: Collectable = Collectable.new("Dinosaur Bones", 1000, 1, Collectable.CollectableType.ARTIFACT)
+static var TREASURE: Collectable = Collectable.new("Treasure", 5000, 1, Collectable.CollectableType.ARTIFACT)
+static var MARTIAN_SKELETON: Collectable = Collectable.new("Martian Skeleton", 10000, 1, Collectable.CollectableType.ARTIFACT)
+static var RELIGIOUS_ARTIFACT: Collectable = Collectable.new("Religious Artifact", 50000, 1, Collectable.CollectableType.ARTIFACT)
 # Array for easy access
 static var ARTIFACTS: Array[Collectable] = [DINOSAUR_BONES, TREASURE, MARTIAN_SKELETON, RELIGIOUS_ARTIFACT]
 
@@ -108,3 +108,21 @@ static var DYNAMITE: Item = Item.new("Dynamite", 2000)
 static var PLASTIC_EXPLOSIVES: Item = Item.new("Plastic Explosives", 5000)
 static var QUANTUM_TELEPORTER: Item = Item.new("Quantum Teleporter", 2000)
 static var MATTER_TRANSMITTER: Item = Item.new("Matter Transmitter", 10000)
+
+
+
+@onready var player: PlayerFlash = $PlayerFlash
+@onready var earth: EarthFlash = $EarthFlash
+
+
+
+func _ready() -> void:
+	Engine.max_fps = 60
+	
+	player.drill = STOCK_DRILL
+	player.hull = STOCK_HULL
+	player.engine = STOCK_ENGINE
+	player.fuel_tank = MICRO_TANK
+	player.radiator = STOCK_FAN
+	player.bay = MICRO_BAY
+	
