@@ -18,9 +18,9 @@ const AIR_RESISTANCE: float = 0.98
 ## The only exception to exact equality of the code in ActionScript is the delta time paradism, 
 ## which Motherload does not use. 
 func _physics_process(delta: float) -> void:
-	var right_pressed: bool = Input.is_action_pressed("move_right")
-	var left_pressed: bool = Input.is_action_pressed("move_left")
-	var up_pressed: bool = Input.is_action_pressed("move_up")
+	var r: bool = Input.is_action_pressed("move_right")
+	var l: bool = Input.is_action_pressed("move_left")
+	var u: bool = Input.is_action_pressed("move_up")
 
 	# Flash Motherload has frame-dependent physics calculations. We assume that our game runs at
 	# the optimal flash fps (24) and adjust our delta time for it. This allows us to keep the
@@ -33,78 +33,9 @@ func _physics_process(delta: float) -> void:
 	# ActionScript representative velocity back into Godot's velocity system. 
 	var xVel: float = float(velocity.x) / float(FLASH_FPS)
 	var yVel: float = float(velocity.y) / float(FLASH_FPS)
-	
-	# This handles movement outside of drilling. 
-	if !is_drilling():
-		# Check whether pod is not moving vertically and is on floor (grounded?)
-		if int(yVel / 10.0) == 0 and is_on_floor():
-			if right_pressed:
-				xVel = minf(xVel + (float(engine.base_power) / float(calculate_weight())) * delta_f, engine.base_power / 10.0)
-				fuel -= (engine.base_power / 50000.0) * delta_f
-				steam_count += 4
-			elif left_pressed:
-				xVel = maxf(xVel - (float(engine.base_power) / float(calculate_weight())) * delta_f, -engine.base_power / 10.0)
-				fuel -= (engine.base_power / 50000.0) * delta_f
-				steam_count += 4
-			elif up_pressed and not is_turning(): # on floor and turning means pod can't take off
-				yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight())) * 2 * delta_f, -engine.base_power / 10.0)
-				fuel -= (engine.base_power / 50000.0) * delta_f
-			
-			# Apply friction using delta time
-			xVel -= xVel * (1 - FRICTION) * delta_f
-			
-			# Set rotation to 0 degrees and rotor speed to 0 since we are on the ground
-			self.rotation_degrees = 0
-			rotor_speed = 0
-		
-		else: # Airborn case I guess? 
-			if right_pressed:
-				xVel = minf(xVel + (float(engine.base_power) / float(calculate_weight()) / 1.5) * delta_f, engine.base_power / 10.0)
-				rotation_degrees = minf(rotation_degrees + (engine.base_power / 50.0) * delta_f, 15)
-				fuel -= (engine.base_power / 50000.0) * delta_f
-				rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
-				steam_count += 2
-			elif left_pressed:
-				xVel = maxf(xVel - (float(engine.base_power)/float(calculate_weight())/1.5)*delta_f, -engine.base_power / 10.0)
-				rotation_degrees = maxf(rotation_degrees - (engine.base_power / 50.0) * delta_f, -15)
-				fuel -= (engine.base_power / 50000.0) * delta_f
-				rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
-				steam_count += 2
-			# Flying with no direction held, so we decrease angle of flight towards zero
-			elif rotation_degrees > 1:
-				rotation_degrees -= 1 * delta_f
-			elif rotation_degrees < -1:
-				rotation_degrees += 1 * delta_f
-			
-			if up_pressed:
-				## My best guess for this case distinction is when the pod is taking off, we do not
-				## need to update the rotor speed. Also physics slightly different I guess.
-				if state_machine.is_current_any(["Flight","TurnFlight"]):
-					rotor_speed = minf(rotor_speed + 1 * delta_f, 11)
-					yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight())) * delta_f, -engine.base_power / 12.0)
-				else:
-					yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight()) / 1.5) * delta_f, -engine.base_power / 12.0)
-				rotation_degrees *= 0.7 # Random rotation resistance? Why?
-				fuel -= (engine.base_power / 50000.0) * delta_f
-				steam_count += 4
-			
-			# Add air resistance and gravity
-			xVel -= xVel * (1 - AIR_RESISTANCE) * delta_f
-			yVel -= yVel * (1 - AIR_RESISTANCE) * delta_f
-			yVel = minf(yVel + (GRAVITY / 30.0) * delta_f, 20.0)
-			
-			# The code applies this if the mode is "air", so I assume this means both flight and 
-			# turning whilst flying. 
-			if state_machine.is_current_any(["Flight","TurnFlight"]):
-				rotor_speed = maxf(rotor_speed * 0.95, 2)
-	
-	fuel -= (engine.base_power / 100000.0) * delta_f # Base fuel use?
-	
-	print(yVel)
-	
-	# Calculate ActionScripts velocities back into Godot's velocity system
-	velocity.x = xVel * FLASH_FPS
-	velocity.y = yVel * FLASH_FPS
+	var updatedVel = actionscript_move_subroutine(xVel, yVel, delta_f, r, l, u)
+	velocity.x = updatedVel.x * FLASH_FPS
+	velocity.y = updatedVel.y * FLASH_FPS
 	
 	# Move now so I can check for bouncing afterwards
 	var was_on_floor = is_on_floor()
@@ -202,3 +133,74 @@ func _physics_process(delta: float) -> void:
 	
 	move_and_slide()
 	"""
+
+
+
+func actionscript_move_subroutine(xVel: float, yVel: float, delta_f: float, r: bool, l: bool, u: bool) -> Vector2:
+	# This handles movement outside of drilling. 
+	if !is_drilling():
+		# Check whether pod is not moving vertically and is on floor (grounded?)
+		if int(yVel / 10.0) == 0 and is_on_floor():
+			if r:
+				xVel = minf(xVel + (float(engine.base_power) / float(calculate_weight())) * delta_f, engine.base_power / 10.0)
+				fuel -= (engine.base_power / 50000.0) * delta_f
+				steam_count += 4
+			elif l:
+				xVel = maxf(xVel - (float(engine.base_power) / float(calculate_weight())) * delta_f, -engine.base_power / 10.0)
+				fuel -= (engine.base_power / 50000.0) * delta_f
+				steam_count += 4
+			elif u and not is_turning(): # on floor and turning means pod can't take off
+				yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight())) * 2 * delta_f, -engine.base_power / 10.0)
+				fuel -= (engine.base_power / 50000.0) * delta_f
+			
+			# Apply friction using delta time
+			xVel -= xVel * (1 - FRICTION) * delta_f
+			
+			# Set rotation to 0 degrees and rotor speed to 0 since we are on the ground
+			self.rotation_degrees = 0
+			rotor_speed = 0
+		
+		else: # Airborn case I guess? 
+			if r:
+				xVel = minf(xVel + (float(engine.base_power) / float(calculate_weight()) / 1.5) * delta_f, engine.base_power / 10.0)
+				rotation_degrees = minf(rotation_degrees + (engine.base_power / 50.0) * delta_f, 15)
+				fuel -= (engine.base_power / 50000.0) * delta_f
+				rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
+				steam_count += 2
+			elif l:
+				xVel = maxf(xVel - (float(engine.base_power)/float(calculate_weight())/1.5)*delta_f, -engine.base_power / 10.0)
+				rotation_degrees = maxf(rotation_degrees - (engine.base_power / 50.0) * delta_f, -15)
+				fuel -= (engine.base_power / 50000.0) * delta_f
+				rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
+				steam_count += 2
+			# Flying with no direction held, so we decrease angle of flight towards zero
+			elif rotation_degrees > 1:
+				rotation_degrees -= 1 * delta_f
+			elif rotation_degrees < -1:
+				rotation_degrees += 1 * delta_f
+			
+			if u:
+				## My best guess for this case distinction is when the pod is taking off, we do not
+				## need to update the rotor speed. Also physics slightly different I guess.
+				if state_machine.is_current_any(["Flight","TurnFlight"]):
+					rotor_speed = minf(rotor_speed + 1 * delta_f, 11)
+					yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight())) * delta_f, -engine.base_power / 12.0)
+				else:
+					yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight()) / 1.5) * delta_f, -engine.base_power / 12.0)
+				rotation_degrees *= 0.7 # Random rotation resistance? Why?
+				fuel -= (engine.base_power / 50000.0) * delta_f
+				steam_count += 4
+			
+			# Add air resistance and gravity
+			xVel -= xVel * (1 - AIR_RESISTANCE) * delta_f
+			yVel -= yVel * (1 - AIR_RESISTANCE) * delta_f
+			yVel = minf(yVel + (GRAVITY / 30.0) * delta_f, 20.0)
+			
+			# The code applies this if the mode is "air", so I assume this means both flight and 
+			# turning whilst flying. 
+			if state_machine.is_current_any(["Flight","TurnFlight"]):
+				rotor_speed = maxf(rotor_speed - rotor_speed * 0.05 * delta_f, 2)
+	
+	fuel -= (engine.base_power / 100000.0) * delta_f # Base fuel use?
+	
+	return Vector2(xVel, yVel)

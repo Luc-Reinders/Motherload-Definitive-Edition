@@ -11,9 +11,9 @@ enum DrillDirection {
 @onready var animated_sprite : AnimatedSprite2D = $AnimatedSprite
 @onready var collision_shape : CollisionShape2D = $CollisionShape2D
 @onready var state_machine: StateMachine = $"State Machine"
-@export var earth : EarthAbstract # TODO: Remove as export and make an argument in methods?
+@export var earth : EarthAbstract 
 
-@export var pod_mass: int # Mass in Decakilograms (1980 kgs becomes 198)
+@export var pod_mass: int # In flash mass is in Decakilograms (1980 kgs becomes 198)
 
 # Pod component variables
 var drill: Drill 
