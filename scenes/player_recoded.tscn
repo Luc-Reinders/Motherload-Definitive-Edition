@@ -1,7 +1,0 @@
-[gd_scene format=3 uid="uid://g4mpedio210h"]
-
-[ext_resource type="PackedScene" uid="uid://cgffgcwqawfu6" path="res://scenes/player_abstract.tscn" id="1_kvu06"]
-[ext_resource type="Script" uid="uid://dohcaqnx0nkob" path="res://scripts/player/player_recoded.gd" id="2_sutsl"]
-
-[node name="PlayerAbstract" unique_id=25987061 instance=ExtResource("1_kvu06")]
-script = ExtResource("2_sutsl")
