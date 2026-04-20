@@ -1,7 +1,0 @@
-[gd_scene format=3 uid="uid://cyxhd1k7b3yhm"]
-
-[ext_resource type="PackedScene" uid="uid://iioow7wbouvb" path="res://scenes/earth_abstract.tscn" id="1_0xmsc"]
-[ext_resource type="Script" uid="uid://ce48lwa3eieaj" path="res://scripts/earth/earth_recoded.gd" id="2_o1c3d"]
-
-[node name="AbstractEarth" unique_id=643595024 instance=ExtResource("1_0xmsc")]
-script = ExtResource("2_o1c3d")

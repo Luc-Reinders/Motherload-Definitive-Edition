@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://471ds1rsbjjk"]
+
+[ext_resource type="Script" uid="uid://burvpvtcdgdrg" path="res://scripts/flash/motherload_flash.gd" id="1_oml67"]
+[ext_resource type="PackedScene" uid="uid://5fff2iprddre" path="res://scenes/flash/earth_flash.tscn" id="2_tn58e"]
+[ext_resource type="PackedScene" uid="uid://cgffgcwqawfu6" path="res://scenes/flash/player_flash.tscn" id="3_n1yvv"]
+
+[node name="MotherloadFlash" type="Node2D" unique_id=1236072408]
+script = ExtResource("1_oml67")
+
+[node name="EarthFlash" parent="." unique_id=643595024 instance=ExtResource("2_tn58e")]
+
+[node name="PlayerFlash" parent="." unique_id=25987061 node_paths=PackedStringArray("earth") instance=ExtResource("3_n1yvv")]
+position = Vector2(0, -47)
+earth = NodePath("../EarthFlash")
