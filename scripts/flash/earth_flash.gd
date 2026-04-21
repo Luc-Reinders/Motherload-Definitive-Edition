@@ -3,11 +3,11 @@ class_name EarthFlash
 
 ## Sets a tile to the half dug texture and handles the surrounding cave texture logic. This function 
 ## handles the logic identically to the flash version of Motherload, which has a texturing mistake. 
-func set_half_dug(cell: Vector2i, drill_direction: PlayerAbstract.DrillDirection, facing_right: bool) -> void:
+func set_half_dug(cell: Vector2i, drill_direction: PlayerAbstract.DigDirection, facing_right: bool) -> void:
 	# TODO: Commented correct code out to replace with recoded version for testing purposes. Re-enable "false" code later
 	
 	"""
-	if drill_direction == PlayerAbstract.DrillDirection.DOWN:
+	if drill_direction == PlayerAbstract.DigDirection.DOWN:
 		set_tile(cell, Tiles.HALF_DUG, TileTransform.ROTATE_90)
 		set_appropriate_cave_texture(cell + Vector2i(0, -1)) 
 	elif facing_right: # Player is digging to the right
@@ -17,7 +17,7 @@ func set_half_dug(cell: Vector2i, drill_direction: PlayerAbstract.DrillDirection
 		set_tile(cell, Tiles.HALF_DUG, TileTransform.ROTATE_180)
 		set_appropriate_cave_texture(cell + Vector2i(1, 0)) 
 	"""
-	if drill_direction == PlayerAbstract.DrillDirection.DOWN:
+	if drill_direction == PlayerAbstract.DigDirection.DOWN:
 		set_tile(cell, Tiles.HALF_DUG, TileTransform.ROTATE_90)
 		
 		if cell.y <= 0: # Edge case when digging from ground level

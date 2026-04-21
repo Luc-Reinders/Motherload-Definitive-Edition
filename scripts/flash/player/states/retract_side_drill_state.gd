@@ -4,7 +4,6 @@ class_name PlayerFlashRetractSideDrillState
 @export var player : PlayerFlash
 
 func enter():
-	player._preparing_digging_down = true
 	player.animated_sprite.play(AnimatedSpritePlayerFlash.RETRACT_SIDE_DRILL_ANIM)
 
 func _on_animated_sprite_animation_finished() -> void:

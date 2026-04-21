@@ -214,5 +214,5 @@ func obtain_neighbor_bit_mask(cell: Vector2i) -> Array[bool]:
 
 
 
-func set_half_dug(cell: Vector2i, drill_direction: PlayerAbstract.DrillDirection, facing_right: bool) -> void:
+func set_half_dug(_cell: Vector2i, _drill_direction: PlayerAbstract.DigDirection, _facing_right: bool) -> void:
 	push_error("set_half_dug() must be overriden")

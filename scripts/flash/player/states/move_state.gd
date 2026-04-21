@@ -27,14 +27,14 @@ func update(_delta):
 			player.face_right()
 			go_to_state(StateMachinePlayerFlash.TURN_GROUND_STATE)
 		elif player.is_on_wall() and player.is_on_floor():
-			go_to_state(StateMachinePlayerFlash.DRILL_SIDE_STATE)
+			go_to_state(StateMachinePlayerFlash.DIG_SIDE_STATE)
 	elif left:
 		if player.is_facing_right() and player.velocity.x < 0:
 			# Turn left
 			player.face_left()
 			go_to_state(StateMachinePlayerFlash.TURN_GROUND_STATE)
 		elif player.is_on_wall() and player.is_on_floor(): 
-			go_to_state(StateMachinePlayerFlash.DRILL_SIDE_STATE)
+			go_to_state(StateMachinePlayerFlash.DIG_SIDE_STATE)
 
 
 func go_to_state(state_name: String):

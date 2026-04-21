@@ -5,7 +5,7 @@ class_name PlayerFlashDrillDownState
 
 func enter():
 	player.animated_sprite.play(AnimatedSpritePlayerFlash.DRILL_DOWN_ANIM)
-	player.start_digging(PlayerAbstract.DrillDirection.DOWN)
+	player.start_digging(PlayerAbstract.DigDirection.DOWN)
 
 func update(_delta):
 	if !player.is_digging():

@@ -8,5 +8,5 @@ func enter():
 
 func _on_animated_sprite_animation_finished() -> void:
 	if animated_sprite.strong_finish_check(AnimatedSpritePlayerFlash.RETRACT_BOTTOM_DRILL_ANIM):
-		transitioned.emit(self, StateMachinePlayerFlash.DRILL_DOWN_STATE)
+		transitioned.emit(self, StateMachinePlayerFlash.DIG_DOWN_STATE)
 	
