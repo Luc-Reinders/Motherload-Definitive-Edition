@@ -6,7 +6,7 @@ enum DigDirection {
 	DOWN
 }
 
-# Nodes in the player class
+# Nodes that must be present in the player scene
 @export var animated_sprite : AnimatedSprite2D
 @export var collision_shape : CollisionShape2D
 @export var state_machine: StateMachine
@@ -30,7 +30,7 @@ var bay_contents: Dictionary[Collectable, int] = {}
 var items: Dictionary[Item, int] = {}
 
 # Other variables
-var steam_rate: float = 0.0 # Represents rate of steam particles that need to be emitted
+var steam_count: float = 0.0 # Counter variable for emitting steam puffs out of the exhaust
 var rotor_speed: float = 0 # Used in the animation speed of the flying animation
 
 # digging logic variables
@@ -44,11 +44,22 @@ var _digging_reload_flag: bool = false # For loading half dug tile, damaging pla
 var _digging_target_cell: Vector2i
 var _digging_x_align_velocity: float # aligning horizontally velocity for digging down
 
+# collision logic variables
+var _was_on_floor_previous_physics_iter: bool = false
+var _was_on_ceiling_previous_physics_iter: bool = false
+var _yVel_previous_physics_iter: float = 0
+
 # Turning logic variable
 var _turning: bool = false
 func is_turning() -> bool:
 	return _turning
+func start_turning() -> void:
+	_turning = true
+func finish_turning() -> void:
+	_turning = false
+	
 
+@export var puff_scene = preload("res://scenes/steam_particle.tscn") # no better way?
 
 
 func is_facing_right() -> bool:
@@ -174,23 +185,139 @@ func calculate_dig_velocity_actionscript(depth: float, drill_base_speed: float) 
 
 
 
+## This comment is used to explain the main paradigms used to recreate the Motherload physics as
+## closely as possible. We will often refer to the code of Motherload as ActionScript (AS) code, 
+## since AS is the main programming language used for Motherload.
+##
+## First, Motherload has frame-dependent physics calculations. This means that the velocities used
+## in the AS code have unit px/frame. The velocities in Godot have unit px/s. To make
+## conversions between Godot's- and AS's velocities, we must fix an FPS value for the
+## Motherload game. Once we do that, we can easily convert between the velocities like this:
+## VelAS = velocity_godot / FLASH_FPS
+## velocity_godot = VelAS * FLASH_FPS
+## (Note that we also keep AS's naming convention for clarity which variables belong to
+## which part of the logic). These velocity conversions give us a strategy to re-create the game 
+## physics as closely as we possibly can:
+## 1. Convert Godot velocity to AS velocity
+## 2. Run physic process subroutines acting as closely(*) as possible to the original flash code. 
+##    These subroutines may update the AS velocities passed in. 
+## 3. Convert AS velocity back into Godot velocity
+##
+## (*): Whilst we aim to re-create the subroutines as closely as possible, we do want the subroutine
+## physics to use the delta-time paradigm for obvious reasons. A very elegant solution can be 
+## obtained that minimizes the amount of calculation changes needed whilst still keeping the
+## physics practically identical:
+## We already assume a fixed FPS that Motherload runs on. If our physics loop updates exactly every
+## 1/FPS_FLASH seconds, then all the formulas remain the same. However, if our physics updates every
+## 1/(2 * FPS_FLASH) seconds (so twice as fast as Flash Motherload), then we want to halve all
+## incremental calculations. This is the core idea behind delta-time, but our delta in this case
+## is linearly scaled. To be precise, all incremental calculations need to be scaled by a factor of
+## delta * FLASH_FPS. This aligns with the previous examples as well.
+## Thus we calculate delta_f = delta * FLASH_FPS, which we use to modify our incremental
+## calculations in our AS subroutines. 
 func _physics_process(delta: float) -> void:
-	# Flash Motherload has frame-dependent physics calculations. We assume that our game runs at
-	# the optimal flash fps (24) and adjust our delta time for it. This allows us to keep the
-	# formulas in the decompiled code precisely the same, but still adjust for delta time.
 	var delta_f: float = delta * Constants.FLASH_FPS
 	
+	# Godot velocity -> AS velocity conversion
+	var xVel := velocity.x / Constants.FLASH_FPS
+	var yVel := velocity.y / Constants.FLASH_FPS
+	
+	# Run AS subroutine
+	var Vel := _physics_as_subroutine(xVel, yVel, delta_f)
+	
+	# AS velocity -> Godot velocity conversion and apply the velocity
+	velocity.x = Vel.x * Constants.FLASH_FPS
+	velocity.y = Vel.y * Constants.FLASH_FPS
+	
+	move_and_slide() 
+
+
+
+
+
+func _physics_as_subroutine(xVel: float, yVel: float, delta_f: float) -> Vector2:
+	# Digging and player movement subroutines
 	if is_digging():
-		_physics_process_digging(delta, delta_f)
+		_process_digging_as_subroutine(delta_f)
 	else:
-		_physics_process_move(delta, delta_f)
+		var Vel : Vector2 = _process_moving_as_subroutine(xVel, yVel, delta_f)
+		xVel = Vel.x
+		yVel = Vel.y
+	
+	# Base fuel use
+	fuel -= (engine.base_power / 100000.0) * delta_f 
+	
+	# The next code is on the handling of player bouncing; If you hit the ground (or ceiling) hard, 
+	# you bounce a couple of times before becoming fully grounded. However, the way we implement it 
+	# here is functionally slightly different from the AS code. The difference is the use of the 
+	# previous yVel velocity instead of yVel directly. The best way to explain how and why, is to 
+	# explain how Motherload handles the player bouncing:
+	# Motherload checks whether the player would hit the ground on the next frame with the given
+	# y velocity. If the player would hit the ground, then we apply the "bounce" immediately, 
+	# meaning we reverse the velocity times factor 0.2. However, since the player is still in the
+	# air, this would mean the player practically ends up bouncing on air.
+	# This strange physics behavior is hardly noticable in game, mostly due to the camera lagging
+	# behind the player when falling with high velocity. However, recreating this behavior could 
+	# lead to strange behavior with the delta-time paradigm in cases of extremely low FPS; If the 
+	# FPS is very low, the velocities are scaled to still match the game physics. This would mean 
+	# the downwards velocity is also scaled up, causing this "air-bouncing" problem to be amplified.
+	# 
+	# This behavior is obviously not desired. So instead, we let the player first move to the 
+	# ground (Godot handles this nicely for us). Then we apply the bounce velocity using the 
+	# previous yVel value. Think of it as delaying the AS bounce for 1 frame to let the player 
+	# properly hit the ground. 
+	# TODO: Perhaps add in tiny factor to make bounce a little higher. On average, the bounce would
+	# be higher in Flash Motherload due to this "air-bouncing" behavior then is currently 
+	# implemented here.
+	if _yVel_previous_physics_iter > 0:
+		if is_on_floor(): 
+			if not _was_on_floor_previous_physics_iter:
+				if _yVel_previous_physics_iter > 7.0:
+					var damage = _yVel_previous_physics_iter / 2.0
+					# TODO: apply damage
+				yVel = -0.2 * _yVel_previous_physics_iter
+			_was_on_floor_previous_physics_iter = true
+		else:
+			_was_on_floor_previous_physics_iter = false
+	elif _yVel_previous_physics_iter < 0:
+		if is_on_ceiling():
+			if not _was_on_ceiling_previous_physics_iter:
+				yVel = -0.2 * _yVel_previous_physics_iter 
+			_was_on_ceiling_previous_physics_iter = true
+		else:
+			_was_on_ceiling_previous_physics_iter = false
+	
+	# Increased y-deadzone if on ground to prevent flying away when player is too fat :p
+	# Note: This can be circumvented by dropping off of a tile and then initiating flight. 
+	# TODO: Fix for recoded?
+	if is_on_floor() and abs(yVel) < 0.12:
+		yVel = 0.0
+	
+	# Deadzones for AS velocities
+	if abs(xVel) < 0.12:
+		xVel = 0.0
+	if abs(yVel) < 0.07:
+		yVel = 0.0
+	
+	# Passive steam count increase and spawn steam puffs
+	steam_count += 2 * delta_f
+	if steam_count > 20.0:
+		steam_count = 0
+		spawn_steam_puff()
+	
+	# Save current y velocity as previous iteration for next iteration
+	_yVel_previous_physics_iter = yVel
+	
+	return Vector2(xVel, yVel)
+
+
 
 
 
 ## In this method we process the digging as closely as possible to the original flash Motherload.
 ## The most notable exception in design of the code is the use of delta time. 
-func _physics_process_digging(_delta: float, delta_f: float) -> void:
-	steam_rate += 4 * delta_f
+func _process_digging_as_subroutine(delta_f: float) -> void:
+	steam_count += 4 * delta_f
 	fuel -= (engine.base_power / 25000.0) * delta_f
 	
 	if _digging_direction == DigDirection.DOWN:
@@ -221,57 +348,28 @@ func _physics_process_digging(_delta: float, delta_f: float) -> void:
 				# TODO: add detection for natural gas tile
 		else:
 			finish_digging()
-	
-	move_and_slide()
+
+
 
 
 
 ## In this method we process the movement as closely as possible to the original flash Motherload.
 ## The most notable exception in design of the code is the use of delta time. 
-func _physics_process_move(_delta: float, delta_f: float) -> void:
+func _process_moving_as_subroutine(xVel: float, yVel: float, delta_f: float) -> Vector2:
 	var r: bool = Input.is_action_pressed("move_right")
 	var l: bool = Input.is_action_pressed("move_left")
 	var u: bool = Input.is_action_pressed("move_up")
 	
-	# The velocity in Godot has unit px/sec and in the flash Motherload script it has unit px/frame.
-	# To resolve this, we convert our x velocity to a representative velocity in the ActionScript
-	# code. Then we run it through (which is essentially) the ActionScript code, and convert the
-	# ActionScript representative velocity back into Godot's velocity system. 
-	var xVel: float = float(velocity.x) / float(Constants.FLASH_FPS)
-	var yVel: float = float(velocity.y) / float(Constants.FLASH_FPS)
-	var updatedVel = actionscript_move_subroutine(xVel, yVel, delta_f, r, l, u)
-	velocity.x = updatedVel.x * Constants.FLASH_FPS
-	velocity.y = updatedVel.y * Constants.FLASH_FPS
-	
-	# Move now so I can check for bouncing afterwards
-	var on_floor_before_move = is_on_floor()
-	var on_ceiling_before_move = is_on_ceiling()
-	move_and_slide() 
-	
-	# Compute bouncing variables for next iteration. Note that yVel is the ActionScript velocity
-	# of the *previous* iteration. However, since yVel is the ActionScript velocity in the previous
-	# iteration, we use it directly to calculate the new Godot y velocity.
-	if not on_floor_before_move and is_on_floor(): # Player hit the ground on this frame
-		if yVel > 7:
-			var damage = yVel / 7.0
-			# TODO: apply damage
-		velocity.y = -0.2 * (yVel * Constants.FLASH_FPS)
-	elif not on_ceiling_before_move and is_on_ceiling(): #Player hit the ceiling on this frame
-		velocity.y = -0.2 * (yVel * Constants.FLASH_FPS)
-
-
-
-func actionscript_move_subroutine(xVel: float, yVel: float, delta_f: float, r: bool, l: bool, u: bool) -> Vector2:
 	# Check whether pod is not moving vertically and is on floor (grounded?)
 	if int(yVel / 10.0) == 0 and is_on_floor():
 		if r:
 			xVel = minf(xVel + (float(engine.base_power) / float(calculate_weight())) * delta_f, engine.base_power / 10.0)
 			fuel -= (engine.base_power / 50000.0) * delta_f
-			steam_rate += 4 * delta_f
+			steam_count += 4 * delta_f
 		elif l:
 			xVel = maxf(xVel - (float(engine.base_power) / float(calculate_weight())) * delta_f, -engine.base_power / 10.0)
 			fuel -= (engine.base_power / 50000.0) * delta_f
-			steam_rate += 4 * delta_f
+			steam_count += 4 * delta_f
 		elif u and not is_turning(): # on floor and turning means pod can't take off
 			yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight())) * 2 * delta_f, -engine.base_power / 10.0)
 			fuel -= (engine.base_power / 50000.0) * delta_f
@@ -289,13 +387,13 @@ func actionscript_move_subroutine(xVel: float, yVel: float, delta_f: float, r: b
 			rotation_degrees = minf(rotation_degrees + (engine.base_power / 50.0) * delta_f, 15)
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
-			steam_rate += 2 * delta_f
+			steam_count += 2 * delta_f
 		elif l:
 			xVel = maxf(xVel - (float(engine.base_power)/float(calculate_weight())/1.5)*delta_f, -engine.base_power / 10.0)
 			rotation_degrees = maxf(rotation_degrees - (engine.base_power / 50.0) * delta_f, -15)
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
-			steam_rate += 2 * delta_f
+			steam_count += 2 * delta_f
 		# Flying with no direction held, so we decrease angle of flight towards zero
 		elif rotation_degrees > 1:
 			rotation_degrees -= 1 * delta_f
@@ -312,7 +410,7 @@ func actionscript_move_subroutine(xVel: float, yVel: float, delta_f: float, r: b
 				yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight()) / 1.5) * delta_f, -engine.base_power / 12.0)
 			rotation_degrees *= 0.7 # Random rotation resistance? Why?
 			fuel -= (engine.base_power / 50000.0) * delta_f
-			steam_rate += 4 * delta_f
+			steam_count += 4 * delta_f
 			
 		# Add air resistance and gravity
 		xVel -= xVel * (1 - Constants.AIR_RESISTANCE) * delta_f
@@ -324,6 +422,26 @@ func actionscript_move_subroutine(xVel: float, yVel: float, delta_f: float, r: b
 		if state_machine.is_current_any(["Flight","TurnFlight"]):
 			rotor_speed = maxf(rotor_speed - rotor_speed * 0.05 * delta_f, 2)
 	
-	fuel -= (engine.base_power / 100000.0) * delta_f # Base fuel use?
-	
 	return Vector2(xVel, yVel)
+
+
+
+
+
+func spawn_steam_puff() -> void:
+	# We add the puff to the scene tree first, so all nodes of the steam particle are loaded into
+	# the scene tree.
+	var puff: SteamParticle = puff_scene.instantiate()
+	get_tree().current_scene.add_child(puff)
+	
+	var offset: int
+	if is_facing_right():
+		offset = -24
+	else:
+		offset = 24
+		puff.animated_sprite.flip_h = true
+	
+	# Setting position and adding some randomness like in the Motherload code
+	puff.global_position.x = global_position.x + offset + randi_range(0, 1) * 3 
+	puff.global_position.y = global_position.y - 23
+	puff.pivot.rotation_degrees = randi_range(0, 39) - 20

@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://cld8rjggih4nv"]
+
+[ext_resource type="Script" uid="uid://den0muxehml6" path="res://scripts/abstract/player/steam_particle.gd" id="1_uybcs"]
+[ext_resource type="Texture2D" uid="uid://bfkrg6onpcq3s" path="res://assets/sprites/steam_particle/1.png" id="2_fd5o3"]
+[ext_resource type="Texture2D" uid="uid://db8rlgly2vnmi" path="res://assets/sprites/steam_particle/2.png" id="3_7b446"]
+[ext_resource type="Texture2D" uid="uid://bj4p6gwwhtll5" path="res://assets/sprites/steam_particle/3.png" id="4_on7yj"]
+[ext_resource type="Texture2D" uid="uid://w28kk45qolij" path="res://assets/sprites/steam_particle/4.png" id="5_ihfyh"]
+[ext_resource type="Texture2D" uid="uid://dsbbxgnkwof84" path="res://assets/sprites/steam_particle/5.png" id="6_4u1hb"]
+[ext_resource type="Texture2D" uid="uid://bebflldgw2uqq" path="res://assets/sprites/steam_particle/6.png" id="7_252ku"]
+[ext_resource type="Texture2D" uid="uid://cfrtaf3ylpdup" path="res://assets/sprites/steam_particle/7.png" id="8_pmoc3"]
+[ext_resource type="Texture2D" uid="uid://c3mwlu0x444t0" path="res://assets/sprites/steam_particle/8.png" id="9_vfkoj"]
+[ext_resource type="Texture2D" uid="uid://ii8law76f0g4" path="res://assets/sprites/steam_particle/9.png" id="10_x3uyy"]
+[ext_resource type="Texture2D" uid="uid://dy1jhwibf2al7" path="res://assets/sprites/steam_particle/10.png" id="11_v7qq2"]
+[ext_resource type="Texture2D" uid="uid://c5jp768d41eoi" path="res://assets/sprites/steam_particle/11.png" id="12_db0li"]
+[ext_resource type="Texture2D" uid="uid://b1n6ttddkcaxk" path="res://assets/sprites/steam_particle/12.png" id="13_nhpwb"]
+[ext_resource type="Texture2D" uid="uid://c26mwli51v12y" path="res://assets/sprites/steam_particle/13.png" id="14_d4ecr"]
+[ext_resource type="Texture2D" uid="uid://csxaohargtuso" path="res://assets/sprites/steam_particle/14.png" id="15_koos2"]
+[ext_resource type="Texture2D" uid="uid://cpj1blyy77lwe" path="res://assets/sprites/steam_particle/15.png" id="16_lmtep"]
+[ext_resource type="Texture2D" uid="uid://cfaomsy5gnou0" path="res://assets/sprites/steam_particle/16.png" id="17_3qghw"]
+[ext_resource type="Texture2D" uid="uid://c2jlgtwu6kfja" path="res://assets/sprites/steam_particle/17.png" id="18_8ky5h"]
+[ext_resource type="Texture2D" uid="uid://dxk28xrfcmarl" path="res://assets/sprites/steam_particle/18.png" id="19_32w8f"]
+[ext_resource type="Texture2D" uid="uid://c3rw1c064qxvr" path="res://assets/sprites/steam_particle/19.png" id="20_yrbll"]
+[ext_resource type="Texture2D" uid="uid://5q48q880l68p" path="res://assets/sprites/steam_particle/20.png" id="21_ujdpd"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_2d2gd"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_fd5o3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_7b446")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_on7yj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_ihfyh")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_4u1hb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_252ku")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_pmoc3")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_vfkoj")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_x3uyy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_v7qq2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_db0li")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_nhpwb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_d4ecr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_koos2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_lmtep")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_3qghw")
+}, {
+"duration": 1.0,
+"texture": ExtResource("18_8ky5h")
+}, {
+"duration": 1.0,
+"texture": ExtResource("19_32w8f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("20_yrbll")
+}, {
+"duration": 1.0,
+"texture": ExtResource("21_ujdpd")
+}],
+"loop": false,
+"name": &"puff",
+"speed": 24.0
+}]
+
+[node name="SteamParticle" type="Node2D" unique_id=209343065]
+script = ExtResource("1_uybcs")
+
+[node name="Pivot" type="Node2D" parent="." unique_id=205347031]
+
+[node name="AnimatedSprite" type="AnimatedSprite2D" parent="Pivot" unique_id=541359543]
+position = Vector2(0, -40)
+sprite_frames = SubResource("SpriteFrames_2d2gd")
+animation = &"puff"
+autoplay = "puff"
+frame = 19
+frame_progress = 1.0
