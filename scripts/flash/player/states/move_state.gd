@@ -17,24 +17,36 @@ func update(_delta):
 	# code from flash Motherload.
 	player.animated_sprite.speed_scale = (4.0 * abs(player.velocity.x)) / (5.0 * Constants.FLASH_FPS)
 	
-	if up:
+	if up or not player.is_on_floor(): # enter flight
 		go_to_state(StateMachinePlayerFlash.EXTEND_ROTOR_SIDE_DRILL_STATE)
-	elif down: # TODO: Movement speed need to be slow before you are allowed to drill down
-		go_to_state(StateMachinePlayerFlash.RETRACT_SIDE_DRILL_STATE)
+	elif down and player.is_on_floor(): # attempt digging down
+		var dig_check: PlayerAbstract.DigCheckResult = player.dig_check(PlayerAbstract.DigDirection.DOWN)
+		if dig_check == PlayerAbstract.DigCheckResult.VALID: 
+			# Digging success, start preparing for digging down
+			player.velocity = Vector2.ZERO
+			go_to_state(StateMachinePlayerFlash.RETRACT_SIDE_DRILL_STATE)
+		elif dig_check == PlayerAbstract.DigCheckResult.HARD:
+			pass #TODO: add "clink" sound effect here
 	elif right:
-		if not player.is_facing_right() and player.velocity.x > 0: 
+		if not player.is_facing_right() and (player.velocity.x > 0 or player.is_on_wall()): 
 			# Turn right
 			player.face_right()
 			go_to_state(StateMachinePlayerFlash.TURN_GROUND_STATE)
 		elif player.is_on_wall() and player.is_on_floor():
-			go_to_state(StateMachinePlayerFlash.DIG_SIDE_STATE)
+			var dig_check: PlayerAbstract.DigCheckResult = player.dig_check(PlayerAbstract.DigDirection.SIDE)
+			if dig_check == PlayerAbstract.DigCheckResult.VALID: # TODO: add clink? What does motherload do?
+				player.velocity = Vector2.ZERO
+				go_to_state(StateMachinePlayerFlash.DIG_SIDE_STATE)
 	elif left:
-		if player.is_facing_right() and player.velocity.x < 0:
+		if player.is_facing_right() and (player.velocity.x < 0 or player.is_on_wall()):
 			# Turn left
 			player.face_left()
 			go_to_state(StateMachinePlayerFlash.TURN_GROUND_STATE)
 		elif player.is_on_wall() and player.is_on_floor(): 
-			go_to_state(StateMachinePlayerFlash.DIG_SIDE_STATE)
+			var dig_check: PlayerAbstract.DigCheckResult = player.dig_check(PlayerAbstract.DigDirection.SIDE)
+			if dig_check == PlayerAbstract.DigCheckResult.VALID: # TODO: add clink? What does motherload do?
+				player.velocity = Vector2.ZERO
+				go_to_state(StateMachinePlayerFlash.DIG_SIDE_STATE)
 
 
 func go_to_state(state_name: String):

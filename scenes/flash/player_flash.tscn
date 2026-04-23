@@ -697,9 +697,8 @@ animations = [{
 "speed": 24.0
 }]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_kft7l"]
-radius = 15.0
-height = 34.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_dlmcl"]
+size = Vector2(40, 40)
 
 [node name="PlayerFlash" type="CharacterBody2D" unique_id=25987061 node_paths=PackedStringArray("animated_sprite", "collision_shape", "state_machine")]
 script = ExtResource("2_e6gx8")
@@ -716,7 +715,7 @@ autoplay = "move"
 script = ExtResource("3_dlmcl")
 
 [node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1317438549]
-shape = SubResource("CapsuleShape2D_kft7l")
+shape = SubResource("RectangleShape2D_dlmcl")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=1300423187]
 process_callback = 0

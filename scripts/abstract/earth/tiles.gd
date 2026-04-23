@@ -49,7 +49,13 @@ static func is_air_tile(tile: Vector2i) -> bool:
 ## Checks whether the tile occupies space (player cannot move into it)
 static func is_full_tile(tile: Vector2i) -> bool:
 	return !is_air_tile(tile)
-	
+
+## Checks whether the given tile is a tile that can be dug by the player
+static func is_diggable_tile(tile: Vector2i) -> bool:
+	return not is_air_tile(tile) and not is_hard_tile(tile)
+## Hard tiles are full tiles that are undiggable
+static func is_hard_tile(tile: Vector2i) -> bool:
+	return is_rock_tile(tile) or is_hell_tile(tile)
 
 
 

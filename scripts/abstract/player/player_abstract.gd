@@ -5,6 +5,11 @@ enum DigDirection {
 	SIDE,
 	DOWN
 }
+enum DigCheckResult {
+	VALID,
+	HARD,
+	INVALID
+}
 
 # Nodes that must be present in the player scene
 @export var animated_sprite : AnimatedSprite2D
@@ -97,6 +102,36 @@ func get_cell_side() -> Vector2i:
 
 
 
+## Checks whether the neighboring tile in the digging direction is a diggable-, hard- or undiggable
+## tile. 
+func dig_check(dig_direction: DigDirection) -> DigCheckResult:
+	var cell: Vector2i
+	if dig_direction == DigDirection.DOWN:
+		cell = get_cell_below()
+	else:
+		cell = get_cell_side()
+	var tile: Vector2i = earth.get_tile(cell)
+	
+	if Tiles.is_diggable_tile(tile):
+		return DigCheckResult.VALID
+	elif Tiles.is_hard_tile(tile):
+		return DigCheckResult.HARD
+	else:
+		return DigCheckResult.INVALID
+
+
+
+## Motherload has frame-dependent physics calculations. This means that the velocities used in the 
+## AS code have unit px/frame. The velocities in Godot have unit px/s. To make conversions between 
+## Godot's- and AS's velocities, we must fix an FPS value for Flash Motherload. Once we do that, 
+## we can easily convert between the velocities like this:
+## VelAS = velocity_godot / FLASH_FPS
+## velocity_godot = VelAS * FLASH_FPS
+static func convert_to_AS_velocity(godot_velocity: float) -> float:
+	return godot_velocity / Constants.FLASH_FPS 
+static func convert_to_godot_velocity(ASVel: float) -> float:
+	return ASVel * Constants.FLASH_FPS
+
 
 
 func calculate_weight() -> int:
@@ -135,7 +170,7 @@ func start_digging(drill_direction: DigDirection) -> void:
 	# Calculate the digging velocity. First we calculate the actionscript velocity by mimicking the
 	# actionscript code. Then convert the actionscript velocity over to godot's velocity.
 	var digVel := calculate_dig_velocity_actionscript(get_depth(), drill.base_drill_speed)
-	_digging_velocity = digVel * Constants.FLASH_FPS
+	_digging_velocity = convert_to_godot_velocity(digVel)
 	
 	if drill_direction == DigDirection.DOWN:
 		# Here we set the horizontal align velocity when digging down. For the formula we require
@@ -144,7 +179,7 @@ func start_digging(drill_direction: DigDirection) -> void:
 		var digging_target_global_pos := earth.to_global(earth.map_to_local(_digging_target_cell))
 		var player_to_target_diff := digging_target_global_pos - global_position
 		var xAlignVel := (float(player_to_target_diff.x) / 50.0) * digVel
-		_digging_x_align_velocity = xAlignVel * Constants.FLASH_FPS
+		_digging_x_align_velocity = convert_to_godot_velocity(xAlignVel)
 		
 		velocity.y = _digging_velocity
 		velocity.x = _digging_x_align_velocity
@@ -190,14 +225,11 @@ func calculate_dig_velocity_actionscript(depth: float, drill_base_speed: float) 
 ## since AS is the main programming language used for Motherload.
 ##
 ## First, Motherload has frame-dependent physics calculations. This means that the velocities used
-## in the AS code have unit px/frame. The velocities in Godot have unit px/s. To make
-## conversions between Godot's- and AS's velocities, we must fix an FPS value for the
-## Motherload game. Once we do that, we can easily convert between the velocities like this:
-## VelAS = velocity_godot / FLASH_FPS
-## velocity_godot = VelAS * FLASH_FPS
-## (Note that we also keep AS's naming convention for clarity which variables belong to
-## which part of the logic). These velocity conversions give us a strategy to re-create the game 
-## physics as closely as we possibly can:
+## in the AS code have unit px/frame. The velocities in Godot have unit px/s. We can make a 
+## conversion between these velocities by fixing a value for the FPS in Flash Motherload. See the 
+## [method convert_to_AS_velocity] and [method convert_to_godot_velocity] for more details.
+## These velocity conversions give us a strategy to re-create the game physics as closely as we 
+## possibly can:
 ## 1. Convert Godot velocity to AS velocity
 ## 2. Run physic process subroutines acting as closely(*) as possible to the original flash code. 
 ##    These subroutines may update the AS velocities passed in. 
@@ -219,15 +251,15 @@ func _physics_process(delta: float) -> void:
 	var delta_f: float = delta * Constants.FLASH_FPS
 	
 	# Godot velocity -> AS velocity conversion
-	var xVel := velocity.x / Constants.FLASH_FPS
-	var yVel := velocity.y / Constants.FLASH_FPS
+	var xVel := convert_to_AS_velocity(velocity.x)
+	var yVel := convert_to_AS_velocity(velocity.y)
 	
 	# Run AS subroutine
 	var Vel := _physics_as_subroutine(xVel, yVel, delta_f)
 	
 	# AS velocity -> Godot velocity conversion and apply the velocity
-	velocity.x = Vel.x * Constants.FLASH_FPS
-	velocity.y = Vel.y * Constants.FLASH_FPS
+	velocity.x = convert_to_godot_velocity(Vel.x)
+	velocity.y = convert_to_godot_velocity(Vel.y)
 	
 	move_and_slide() 
 
@@ -324,7 +356,7 @@ func _process_digging_as_subroutine(delta_f: float) -> void:
 		var yMoved := global_position.y - _digging_init_global_pos.y
 		var tile := earth.get_tile(get_cell_below())
 		
-		if yMoved < 50.0:
+		if yMoved < 40.0: #50.0
 			if yMoved > 20.0 and not _digging_reload_flag:
 				_digging_reload_flag = true
 				
@@ -378,27 +410,27 @@ func _process_moving_as_subroutine(xVel: float, yVel: float, delta_f: float) -> 
 		xVel -= xVel * (1 - Constants.GROUND_FRICTION) * delta_f
 			
 		# Set rotation to 0 degrees and rotor speed to 0 since we are on the ground
-		self.rotation_degrees = 0
+		animated_sprite.rotation_degrees = 0
 		rotor_speed = 0
 		
 	else: # Airborn case I guess? 
 		if r:
 			xVel = minf(xVel + (float(engine.base_power) / float(calculate_weight()) / 1.5) * delta_f, engine.base_power / 10.0)
-			rotation_degrees = minf(rotation_degrees + (engine.base_power / 50.0) * delta_f, 15)
+			animated_sprite.rotation_degrees = minf(animated_sprite.rotation_degrees + (engine.base_power / 50.0) * delta_f, 15)
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
 			steam_count += 2 * delta_f
 		elif l:
 			xVel = maxf(xVel - (float(engine.base_power)/float(calculate_weight())/1.5)*delta_f, -engine.base_power / 10.0)
-			rotation_degrees = maxf(rotation_degrees - (engine.base_power / 50.0) * delta_f, -15)
+			animated_sprite.rotation_degrees = maxf(animated_sprite.rotation_degrees - (engine.base_power / 50.0) * delta_f, -15)
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
 			steam_count += 2 * delta_f
 		# Flying with no direction held, so we decrease angle of flight towards zero
-		elif rotation_degrees > 1:
-			rotation_degrees -= 1 * delta_f
-		elif rotation_degrees < -1:
-			rotation_degrees += 1 * delta_f
+		elif animated_sprite.rotation_degrees > 1:
+			animated_sprite.rotation_degrees -= 1 * delta_f
+		elif animated_sprite.rotation_degrees < -1:
+			animated_sprite.rotation_degrees += 1 * delta_f
 			
 		if u:
 			## My best guess for this case distinction is when the pod is taking off, we do not
@@ -408,7 +440,7 @@ func _process_moving_as_subroutine(xVel: float, yVel: float, delta_f: float) -> 
 				yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight())) * delta_f, -engine.base_power / 12.0)
 			else:
 				yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight()) / 1.5) * delta_f, -engine.base_power / 12.0)
-			rotation_degrees *= 0.7 # Random rotation resistance? Why?
+			animated_sprite.rotation_degrees *= 0.7 # Random rotation resistance? Why?
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			steam_count += 4 * delta_f
 			

@@ -8,11 +8,12 @@ func enter():
 	player.start_digging(PlayerAbstract.DigDirection.SIDE)
 
 func update(_delta):
-	if !player.is_digging():
+	if !player.is_digging(): # Finished digging
+		player.velocity = Vector2.ZERO
+		
 		var up = Input.is_action_pressed("move_up")
 		var down = Input.is_action_pressed("move_down")
 		
-		# TODO: add functionality to drill again immediately
 		if up:
 			transitioned.emit(self, StateMachinePlayerFlash.EXTEND_ROTOR_SIDE_DRILL_STATE)
 		elif down: 
