@@ -1,6 +1,9 @@
 extends Node
 class_name Tiles
 
+# TODO: Convert this static class into object class such that instances of
+# tiles are Tile objects? 
+
 # All catagories of game tiles. The integers represent the column indices in
 # which they appear in the sprite sheet.
 enum Type {

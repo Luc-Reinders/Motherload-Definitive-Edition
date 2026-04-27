@@ -1,2 +1,2 @@
-extends PlayerAbstract
-class_name PlayerRecoded
+extends AbstractPlayer
+class_name RecodedPlayer

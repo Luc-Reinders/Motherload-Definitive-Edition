@@ -1,11 +1,11 @@
-extends EarthAbstract
-class_name EarthRecoded
+extends AbstractEarth
+class_name RecodedEarth
 
 ## Sets a tile to the half dug texture and handles the surrounding cave texture logic. This function
 ## handles the logic differently to the flash Motherload, by correcting for a texturing mistake 
 ## in the flash Motherload.
-func set_half_dug(cell: Vector2i, drill_direction: PlayerAbstract.DigDirection, facing_right: bool) -> void:
-	if drill_direction == PlayerAbstract.DigDirection.DOWN:
+func set_half_dug(cell: Vector2i, drill_direction: AbstractPlayer.DigDirection, facing_right: bool) -> void:
+	if drill_direction == AbstractPlayer.DigDirection.DOWN:
 		set_tile(cell, Tiles.HALF_DUG, TileTransform.ROTATE_90)
 		
 		if cell.y <= 0: # Edge case when digging from ground level

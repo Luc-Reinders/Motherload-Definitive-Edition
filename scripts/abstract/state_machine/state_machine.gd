@@ -6,6 +6,8 @@ class_name StateMachine
 var current_state : State
 var states: Dictionary[StringName, State] = {}
 
+
+
 # Initialize all children and connect transition signals
 func _ready() -> void:
 	for child in get_children():
@@ -16,6 +18,8 @@ func _ready() -> void:
 	if initial_state:
 		initial_state.enter()
 		current_state = initial_state
+
+
 
 func _process(delta: float):
 	if current_state:
@@ -48,9 +52,13 @@ func on_child_transition(state: State, new_state_name: StringName):
 func get_state_by_name(state_name: String) -> State:
 	return states.get(state_name.to_lower())
 
+## Check whether the current state is the state with the given name
+func is_current_state(state_name: StringName) -> bool:
+	return state_name.to_lower() == current_state.name.to_lower()
+
 ## Checks whether the current state is equal to any state with the same name as in the array
-func is_current_any(state_names: Array[String]) -> bool:
+func is_current_any(state_names: Array[StringName]) -> bool:
 	for state_name in state_names:
-		if state_name.to_lower() == current_state.name.to_lower():
+		if is_current_state(state_name):
 			return true
 	return false
