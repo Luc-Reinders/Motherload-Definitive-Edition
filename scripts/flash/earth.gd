@@ -26,12 +26,15 @@ func set_half_dug(cell: Vector2i, drill_direction: AbstractPlayer.DigDirection, 
 		# Get bit mask from the tile where you started digging
 		var bitmask: Array[bool] = obtain_neighbor_bit_mask(cell + Vector2i(0, -1))
 		var t: bool = bitmask[0]
+		var t_r: bool = bitmask[1]
 		var r: bool = bitmask[2]
 		var b_r: bool = bitmask[3]
 		var b_l: bool = bitmask[5]
 		var l: bool = bitmask[6]
+		var t_l: bool = bitmask[7]
 		
-		if (r or b_r) and (b_l or l): # For these cases the general texturing method works
+		# For these cases the general texturing method works
+		if (r or b_r) and (b_l or l): 
 			set_appropriate_cave_texture(cell + Vector2i(0, -1)) 
 		# For all other cases the general texturing method breaks
 		else:
@@ -42,15 +45,28 @@ func set_half_dug(cell: Vector2i, drill_direction: AbstractPlayer.DigDirection, 
 			if t and r: # l must be false in this case
 				set_tile(cell + Vector2i(0,-1), Tiles.CAVE4, TileTransform.ROTATE_90)
 			elif !t and r: # l must be false in this case
-				set_tile(cell + Vector2i(0,-1), Tiles.CAVE7, TileTransform.ROTATE_180)
+				if t_l:
+					set_tile(cell + Vector2i(0,-1), Tiles.CAVE5, TileTransform.ROTATE_90)
+				else:
+					set_tile(cell + Vector2i(0,-1), Tiles.CAVE7, TileTransform.ROTATE_180)
 			elif t and l: # r must be false in this case
-				set_tile(cell + Vector2i(0,-1), Tiles.CAVE4, TileTransform.ROTATE_90)
+				set_tile(cell + Vector2i(0,-1), Tiles.CAVE4, TileTransform.ROTATE_0)
 			elif !t and l: # r must be false in this case
-				set_tile(cell + Vector2i(0,-1), Tiles.CAVE7, TileSetAtlasSource.TRANSFORM_FLIP_V)
+				if t_r:
+					set_tile(cell + Vector2i(0,-1), Tiles.CAVE5, TileTransform.ROTATE_270)
+				else:
+					set_tile(cell + Vector2i(0,-1), Tiles.CAVE7, TileSetAtlasSource.TRANSFORM_FLIP_V)
 			elif t: # r and l are false
 				set_tile(cell + Vector2i(0,-1), Tiles.CAVE5, TileTransform.ROTATE_0)
 			else: # t, r and l are false
-				set_tile(cell + Vector2i(0,-1), Tiles.CAVE11, TileTransform.ROTATE_90)
+				if t_r and t_l:
+					set_tile(cell + Vector2i(0,-1), Tiles.CAVE9, TileTransform.ROTATE_0)
+				elif t_r:
+					set_tile(cell + Vector2i(0,-1), Tiles.CAVE10, TileTransform.ROTATE_90)
+				elif t_l:
+					set_tile(cell + Vector2i(0,-1), Tiles.CAVE10, TileTransform.ROTATE_180)
+				else:
+					set_tile(cell + Vector2i(0,-1), Tiles.CAVE11, TileTransform.ROTATE_90)
 		
 	elif facing_right: # Player is digging to the right
 		set_tile(cell, Tiles.HALF_DUG, TileTransform.ROTATE_0)
@@ -62,6 +78,7 @@ func set_half_dug(cell: Vector2i, drill_direction: AbstractPlayer.DigDirection, 
 		var t: bool = bitmask[0]
 		var t_r: bool = bitmask[1]
 		var l: bool = bitmask[6]
+		var t_l: bool = bitmask[7]
 		
 		if t or t_r: # For these cases the general texturing method works
 			set_appropriate_cave_texture(cell + Vector2i(-1, 0)) 
@@ -69,13 +86,17 @@ func set_half_dug(cell: Vector2i, drill_direction: AbstractPlayer.DigDirection, 
 			if l: # t and t_r must be false
 				set_tile(cell + Vector2i(-1,0), Tiles.CAVE4, TileTransform.ROTATE_270)
 			else: # t, t_r and l must be false
-				set_tile(cell + Vector2i(-1,0), Tiles.CAVE7,  TileTransform.ROTATE_270 | TileSetAtlasSource.TRANSFORM_FLIP_H)
+				if t_l:
+					set_tile(cell + Vector2i(-1,0), Tiles.CAVE5, TileTransform.ROTATE_180)
+				else:
+					set_tile(cell + Vector2i(-1,0), Tiles.CAVE7,  TileTransform.ROTATE_270 | TileSetAtlasSource.TRANSFORM_FLIP_H)
 	
 	else: # Player is digging to the left. Analogous to drilling right, so read comments there.
 		set_tile(cell, Tiles.HALF_DUG, TileTransform.ROTATE_180)
 	
 		var bitmask: Array[bool] = obtain_neighbor_bit_mask(cell + Vector2i(1, 0))
 		var t: bool = bitmask[0]
+		var t_r: bool = bitmask[1]
 		var r: bool = bitmask[2]
 		var t_l: bool = bitmask[7]
 		
@@ -85,7 +106,10 @@ func set_half_dug(cell: Vector2i, drill_direction: AbstractPlayer.DigDirection, 
 			if r: # t and t_l must be false
 				set_tile(cell + Vector2i(1,0), Tiles.CAVE4, TileTransform.ROTATE_180)
 			else: # t, t_l and r must be false
-				set_tile(cell + Vector2i(1,0), Tiles.CAVE7,  TileTransform.ROTATE_270)
+				if t_r:
+					set_tile(cell + Vector2i(1,0), Tiles.CAVE5, TileTransform.ROTATE_180)
+				else:
+					set_tile(cell + Vector2i(1,0), Tiles.CAVE7,  TileTransform.ROTATE_270)
 
 
 
