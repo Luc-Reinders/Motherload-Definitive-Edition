@@ -2,13 +2,13 @@ extends CharacterBody2D
 class_name AbstractPlayer
 
 # TODO for the player:
-# 1. Fix drilling downwards multiple times
 # 2. Recreate player hitbox
 # 3. Figure out value of FLASH_FPS
 # 4. Implement idle and drilling vibration (look at idle() function?)
 # 5. Check whether rotation is correct. What is pivot of rotation in flash motherload?
 # 6. Make some of the state machine code nicer
 # 7. Implement camera tracking
+# 8. Verify whether movement code is executed also whilst drilling (i dont think it is)
 
 
 enum DigDirection {
@@ -23,13 +23,8 @@ enum DigCheckResult {
 
 
 
-# Visual nodes
-@export var visuals: VisualsNode
-# Animated sprite already exists in visuals, but we need to reference it a lot, so having a quick 
-# access is very nice.
-var anim_sprite: AnimatedSprite2D
-
-# Misc nodes
+# Player nodes
+@export var anim_sprite: AnimatedSprite2D
 @export var collision_shape : CollisionShape2D
 @export var state_machine: StateMachine
 
@@ -63,14 +58,18 @@ var rotor_speed: float = 0 # Used in the animation speed of the flying animation
 
 # digging logic variables
 var _digging: bool = false
-func is_digging() -> bool:
-	return _digging
+var _digging_preparing: bool = false
 var _digging_direction: DigDirection
 var _digging_velocity: float
 var _digging_init_global_pos: Vector2
 var _digging_reload_flag: bool = false # For loading half dug tile, damaging player, and gas pockets
 var _digging_target_cell: Vector2i
 var _digging_x_align_velocity: float # aligning horizontally velocity for digging down
+
+func is_digging() -> bool:
+	return _digging
+func is_preparing_for_digging() -> bool:
+	return _digging_preparing
 
 # bouncing collision logic variables
 var _was_on_floor_previous_physics_iter: bool = false
@@ -96,13 +95,15 @@ func face_left() -> void:
 func flip_face() -> void:
 	anim_sprite.flip_h = !anim_sprite.flip_h
 
+# Calculates whether the player is going to bounce on this frame.
+# TODO: generalize bounce coefficient constant?
+func will_bounce_this_frame():
+	var yVel = 0.2 * _yVel_previous_physics_iter
+	return is_on_floor() and yVel >= 0.12
 
 
 
 
-# on node initialization 
-func _ready() -> void:
-	anim_sprite = visuals.animated_sprite
 
 
 
@@ -188,9 +189,12 @@ func get_depth() -> float:
 ## This method sets logic- and physics variables before preparing for digging.
 func perpare_for_digging() -> void:
 	velocity = Vector2.ZERO
+	_digging_preparing = true
 
 ## This method sets logic- and physics variables pre-digging appropriately.
 func start_digging(drill_direction: DigDirection) -> void:
+	_digging_preparing = false
+	
 	# Set target cell
 	if drill_direction == DigDirection.DOWN:
 		_digging_target_cell = get_cell_below()
@@ -232,6 +236,12 @@ func start_digging(drill_direction: DigDirection) -> void:
 ## earth tiles with appropriate textures.
 func finish_digging() -> void:
 	_digging = false
+	
+	# Fix position
+	if _digging_direction == DigDirection.DOWN:
+		pass
+		var overshoot = (global_position.y - _digging_init_global_pos.y) - 50.0
+		global_position.y -= overshoot
 	
 	# Re-enable collisions after player is done digging
 	collision_shape.disabled = false 
@@ -308,7 +318,7 @@ func _physics_as_subroutine(xVel: float, yVel: float, delta_f: float) -> Vector2
 		if not is_digging():
 			xVel = 0
 			yVel = 0
-	else:
+	elif not is_preparing_for_digging():
 		var Vel : Vector2 = _process_moving_as_subroutine(xVel, yVel, delta_f)
 		xVel = Vel.x
 		yVel = Vel.y
@@ -357,13 +367,16 @@ func _physics_as_subroutine(xVel: float, yVel: float, delta_f: float) -> Vector2
 			_was_on_ceiling_previous_physics_iter = false
 	
 	# Increased y-deadzone if on ground to prevent flying away when player is too fat :p
-	# Note: This can be circumvented by dropping off of a tile and then initiating flight. 
-	# TODO: Fix for recoded?
+	# Note: This can be circumvented by dropping off of a tile and then initiating flight. TODO: Fix for recoded?
 	if is_on_floor() and abs(yVel) < 0.12:
 		yVel = 0.0
 	
 	# Deadzones for AS velocities
-	if abs(xVel) < 0.12:
+	# TODO: I am very certain motherload does not apply this code when digging. That is important,
+	# since that means that all other parts of this code may not be applied as well. This saves on
+	# fuel resources for example. I quick fixed it for now, but I will have to verify that Motherload
+	# may not run this movement code when digging.
+	if abs(xVel) < 0.12 and not is_digging():
 		xVel = 0.0
 	if abs(yVel) < 0.07:
 		yVel = 0.0
@@ -393,7 +406,7 @@ func _process_digging_as_subroutine(delta_f: float) -> void:
 		var yMoved := global_position.y - _digging_init_global_pos.y
 		var tile := earth.get_tile(get_cell_below())
 		
-		if yMoved < 40.0: #50.0
+		if yMoved < 50.0: 
 			if yMoved > 20.0 and not _digging_reload_flag:
 				_digging_reload_flag = true
 				
@@ -447,27 +460,27 @@ func _process_moving_as_subroutine(xVel: float, yVel: float, delta_f: float) -> 
 		xVel -= xVel * (1 - Constants.GROUND_FRICTION) * delta_f
 			
 		# Set rotation to 0 degrees and rotor speed to 0 since we are on the ground
-		visuals.rotation_degrees = 0
+		anim_sprite.rotation_degrees = 0
 		rotor_speed = 0
 		
 	else: # Airborn case I guess? 
 		if r:
 			xVel = minf(xVel + (float(engine.base_power) / float(calculate_weight()) / 1.5) * delta_f, engine.base_power / 10.0)
-			visuals.rotation_degrees = minf(visuals.rotation_degrees + (engine.base_power / 50.0) * delta_f, 15)
+			anim_sprite.rotation_degrees = minf(anim_sprite.rotation_degrees + (engine.base_power / 50.0) * delta_f, 15)
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
 			steam_count += 2 * delta_f
 		elif l:
 			xVel = maxf(xVel - (float(engine.base_power)/float(calculate_weight())/1.5)*delta_f, -engine.base_power / 10.0)
-			visuals.rotation_degrees = maxf(visuals.rotation_degrees - (engine.base_power / 50.0) * delta_f, -15)
+			anim_sprite.rotation_degrees = maxf(anim_sprite.rotation_degrees - (engine.base_power / 50.0) * delta_f, -15)
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
 			steam_count += 2 * delta_f
 		# Flying with no direction held, so decrease angle of flight towards zero
-		elif visuals.rotation_degrees > 1:
-			visuals.rotation_degrees -= 1 * delta_f
-		elif visuals.rotation_degrees < -1:
-			visuals.rotation_degrees += 1 * delta_f
+		elif anim_sprite.rotation_degrees > 1:
+			anim_sprite.rotation_degrees -= 1 * delta_f
+		elif anim_sprite.rotation_degrees < -1:
+			anim_sprite.rotation_degrees += 1 * delta_f
 			
 		if u:
 			## My best guess for this case distinction is when the pod is taking off, we do not
@@ -477,7 +490,7 @@ func _process_moving_as_subroutine(xVel: float, yVel: float, delta_f: float) -> 
 				yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight())) * delta_f, -engine.base_power / 12.0)
 			else:
 				yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight()) / 1.5) * delta_f, -engine.base_power / 12.0)
-			visuals.rotation_degrees *= 0.7 # Random rotation resistance? Why?
+			anim_sprite.rotation_degrees *= 0.7 # Random rotation resistance? Why?
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			steam_count += 4 * delta_f
 			
@@ -514,7 +527,7 @@ func spawn_steam_puff() -> void:
 		puff.animated_sprite.flip_h = true
 	
 	# Setting position and adding some randomness like in the Motherload code
-	var base_pos: Vector2 = visuals.global_position
+	var base_pos: Vector2 = anim_sprite.global_position
 	puff.global_position.x = base_pos.x + offset + randi_range(0, 1) * 3 
 	puff.global_position.y = base_pos.y + STEAM_PUFF_OFFSET_Y
 	puff.pivot.rotation_degrees = randi_range(0, STEAM_PUFF_ROTATION_MAX_DEV) + STEAM_PUFF_ROTATION_OFFSET

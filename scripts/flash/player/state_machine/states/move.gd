@@ -5,7 +5,7 @@ class_name PlayerFlashMoveState
 
 func enter():
 	anim_sprite.play(FlashPlayerAnimatedSprite.MOVE_ANIM)
-	visuals.start_idle_puffing()
+	anim_sprite.start_idle_puffing()
 
 func update(_delta):
 	var right = Input.is_action_pressed("move_right")
@@ -52,5 +52,5 @@ func update(_delta):
 
 func go_to_state(state_name: String):
 	player.anim_sprite.speed_scale = 1
-	player.visuals.stop_idle_puffing()
+	anim_sprite.stop_idle_puffing()
 	transitioned.emit(self, state_name)

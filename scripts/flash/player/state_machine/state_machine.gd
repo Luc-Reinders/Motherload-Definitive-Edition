@@ -26,8 +26,7 @@ func _ready() -> void:
 	
 	for state: PlayerState in states.values():
 		state.player = player
-		state.visuals = player.visuals
-		state.anim_sprite = state.visuals.animated_sprite
+		state.anim_sprite = player.anim_sprite
 	
 	if initial_state:
 		initial_state.enter()

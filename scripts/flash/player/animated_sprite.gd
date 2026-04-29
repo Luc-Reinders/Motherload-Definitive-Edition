@@ -30,3 +30,61 @@ func strong_finish_check(anim: StringName) -> bool:
 	if animation != anim:
 		return false
 	return frame == sprite_frames.get_frame_count(anim) - 1
+
+
+
+
+
+# TODO: Figure out how long between puffs
+const FRAMES_BETWEEN_PUFFS := 3
+const PUFF_FRAMES := 3 # number of puff frames
+
+var _puffing: bool = false
+var _time: float = 0.0
+var _tween: Tween = create_tween()
+
+var _init_y_offset: float
+func _ready() -> void:
+	_init_y_offset = position.y
+
+
+
+func is_idle_puffing() -> bool:
+	return _puffing
+
+## Starts idle puffing on the character sprite. If the character was already
+## puffing, the command is ignored.
+func start_idle_puffing() -> void:
+	pass
+	if not _puffing:
+		_puffing = true
+		puff()
+
+## Stops idle puffing on the character sprite. If the puffing was already
+## stopped, the command is ignored.
+func stop_idle_puffing() -> void:
+	pass
+	if _puffing:
+		_puffing = false
+		_time = 0.0
+		_tween.kill() # Stops all tweening immediately
+		position.y = _init_y_offset
+
+
+
+func _process(delta: float) -> void:
+	pass
+	if _puffing:
+		_time += delta
+		if _time >= (FRAMES_BETWEEN_PUFFS + PUFF_FRAMES) / Constants.FLASH_FPS:
+			puff()
+			_time = 0.0
+
+func puff():
+	# Resets tween
+	_tween.kill()
+	_tween = create_tween()
+	
+	_tween.tween_property(self, "position:y", _init_y_offset + 1.0, 1.0/Constants.FLASH_FPS)
+	_tween.tween_property(self, "position:y", _init_y_offset + 0.5, 1.0/Constants.FLASH_FPS)
+	_tween.tween_property(self, "position:y", _init_y_offset + 0.0, 1.0/Constants.FLASH_FPS)

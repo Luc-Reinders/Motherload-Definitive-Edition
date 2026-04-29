@@ -24,7 +24,7 @@ func update(_delta):
 	# the actionscript code would do.
 	anim_sprite.speed_scale = (player.rotor_speed/5.0)
 	
-	if player.is_on_floor():
+	if player.is_on_floor() and not player.will_bounce_this_frame():
 		if down:
 			go_to_state(StateMachinePlayerFlash.RETRACT_ROTOR_BOTTOM_DRILL_STATE)
 		else:

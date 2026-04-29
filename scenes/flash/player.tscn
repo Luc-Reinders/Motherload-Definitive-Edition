@@ -4,19 +4,13 @@
 [ext_resource type="PackedScene" uid="uid://cld8rjggih4nv" path="res://scenes/steam_particle.tscn" id="2_vnqnq"]
 [ext_resource type="Texture2D" uid="uid://casbr08nhbpbd" path="res://assets/sprites/Pod Horizontally Centered Spritesheet.png" id="3_58ri8"]
 [ext_resource type="Script" uid="uid://bv515cwnwnc5x" path="res://scripts/flash/player/animated_sprite.gd" id="3_dlmcl"]
-[ext_resource type="Script" uid="uid://dj5nuy1h7f0yv" path="res://scripts/flash/player/visuals/visuals.gd" id="3_fltj8"]
 [ext_resource type="Script" uid="uid://cm1a2ibk1t2qp" path="res://scripts/flash/player/state_machine/state_machine.gd" id="3_jovdp"]
 [ext_resource type="Script" uid="uid://jcy3vsg5ofdi" path="res://scripts/flash/player/state_machine/states/move.gd" id="4_jovdp"]
 [ext_resource type="Script" uid="uid://l7h2c6evy4tw" path="res://scripts/flash/player/state_machine/states/flight.gd" id="5_58ri8"]
 [ext_resource type="Script" uid="uid://b7xsjy0jicfb4" path="res://scripts/flash/player/state_machine/states/turn_ground.gd" id="6_7csyp"]
-[ext_resource type="Script" uid="uid://mep0ahsdbtna" path="res://scripts/flash/player/visuals/idle_puff/state_machine.gd" id="6_owoer"]
 [ext_resource type="Script" uid="uid://cwqnlyw6g1wul" path="res://scripts/flash/player/state_machine/states/turn_flight.gd" id="7_0e2rh"]
-[ext_resource type="Script" uid="uid://be3bh4wsywidx" path="res://scripts/flash/player/visuals/idle_puff/states/puff_out.gd" id="7_7347r"]
-[ext_resource type="Script" uid="uid://dsgju3tb3bf5w" path="res://scripts/abstract/state_machine/disabled_state.gd" id="7_laoct"]
 [ext_resource type="Script" uid="uid://db2spkowjmd28" path="res://scripts/flash/player/state_machine/states/extend_rotor_side_drill.gd" id="8_1yn6p"]
-[ext_resource type="Script" uid="uid://chrasdwads5jh" path="res://scripts/flash/player/visuals/idle_puff/states/inhale_half.gd" id="8_laoct"]
 [ext_resource type="Script" uid="uid://cg4w2q7gwyjkw" path="res://scripts/flash/player/state_machine/states/extend_rotor_bottom_drill.gd" id="9_ew0a2"]
-[ext_resource type="Script" uid="uid://bee6rfn342v0o" path="res://scripts/flash/player/visuals/idle_puff/states/inhale_full.gd" id="9_knxex"]
 [ext_resource type="Script" uid="uid://croe55j57d1dk" path="res://scripts/flash/player/state_machine/states/retract_rotor_bottom_drill.gd" id="10_l843g"]
 [ext_resource type="Script" uid="uid://bwi5ofc026ba2" path="res://scripts/flash/player/state_machine/states/retract_rotor_side_drill.gd" id="11_ghm2n"]
 [ext_resource type="Script" uid="uid://bwyqgpwklxc3y" path="res://scripts/flash/player/state_machine/states/retract_side_drill.gd" id="12_ue0rd"]
@@ -707,48 +701,20 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dlmcl"]
 size = Vector2(40, 40)
 
-[node name="Player" type="CharacterBody2D" unique_id=25987061 node_paths=PackedStringArray("visuals", "collision_shape", "state_machine")]
+[node name="Player" type="CharacterBody2D" unique_id=25987061 node_paths=PackedStringArray("anim_sprite", "collision_shape", "state_machine")]
 script = ExtResource("2_e6gx8")
-visuals = NodePath("Visuals")
+anim_sprite = NodePath("AnimatedSprite")
 collision_shape = NodePath("CollisionShape")
 state_machine = NodePath("StateMachine")
 puff_scene = ExtResource("2_vnqnq")
 pod_mass = 198
 
-[node name="Visuals" type="Node2D" parent="." unique_id=385547562]
-script = ExtResource("3_fltj8")
-
-[node name="AnimatedSprite" type="AnimatedSprite2D" parent="Visuals" unique_id=1141550430]
+[node name="AnimatedSprite" type="AnimatedSprite2D" parent="." unique_id=1141550430]
 position = Vector2(0, -8)
 sprite_frames = SubResource("SpriteFrames_31cv2")
 animation = &"move"
 autoplay = "move"
 script = ExtResource("3_dlmcl")
-
-[node name="IdlePuffStateMachine" type="Node" parent="Visuals" unique_id=2138075330 node_paths=PackedStringArray("disabled_state", "initial_state")]
-script = ExtResource("6_owoer")
-disabled_state = NodePath("DisabledState")
-initial_state = NodePath("DisabledState")
-
-[node name="DisabledState" type="Node" parent="Visuals/IdlePuffStateMachine" unique_id=258041804 node_paths=PackedStringArray("exit_state")]
-script = ExtResource("7_laoct")
-exit_state = NodePath("../PuffOut")
-metadata/_custom_type_script = "uid://dsgju3tb3bf5w"
-
-[node name="PuffOut" type="Node" parent="Visuals/IdlePuffStateMachine" unique_id=578989325 node_paths=PackedStringArray("visuals")]
-script = ExtResource("7_7347r")
-visuals = NodePath("../..")
-metadata/_custom_type_script = "uid://be3bh4wsywidx"
-
-[node name="InhaleHalf" type="Node" parent="Visuals/IdlePuffStateMachine" unique_id=1034064142 node_paths=PackedStringArray("visuals")]
-script = ExtResource("8_laoct")
-visuals = NodePath("../..")
-metadata/_custom_type_script = "uid://chrasdwads5jh"
-
-[node name="InhaleFull" type="Node" parent="Visuals/IdlePuffStateMachine" unique_id=1423270277 node_paths=PackedStringArray("visuals")]
-script = ExtResource("9_knxex")
-visuals = NodePath("../..")
-metadata/_custom_type_script = "uid://bee6rfn342v0o"
 
 [node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1317438549]
 shape = SubResource("RectangleShape2D_dlmcl")
@@ -803,13 +769,13 @@ script = ExtResource("16_a2rve")
 [node name="DigSide" type="Node" parent="StateMachine" unique_id=1912266988]
 script = ExtResource("17_jovdp")
 
-[connection signal="animation_finished" from="Visuals/AnimatedSprite" to="StateMachine/TurnGround" method="_on_animated_sprite_animation_finished"]
-[connection signal="animation_finished" from="Visuals/AnimatedSprite" to="StateMachine/TurnFlight" method="_on_animated_sprite_animation_finished"]
-[connection signal="animation_finished" from="Visuals/AnimatedSprite" to="StateMachine/ExtendRotorSideDrill" method="_on_animated_sprite_animation_finished"]
-[connection signal="animation_finished" from="Visuals/AnimatedSprite" to="StateMachine/ExtendRotorBottomDrill" method="_on_animated_sprite_animation_finished"]
-[connection signal="animation_finished" from="Visuals/AnimatedSprite" to="StateMachine/RetractRotorBottomDrill" method="_on_animated_sprite_animation_finished"]
-[connection signal="animation_finished" from="Visuals/AnimatedSprite" to="StateMachine/RetractRotorSideDrill" method="_on_animated_sprite_animation_finished"]
-[connection signal="animation_finished" from="Visuals/AnimatedSprite" to="StateMachine/RetractSideDrill" method="_on_animated_sprite_animation_finished"]
-[connection signal="animation_finished" from="Visuals/AnimatedSprite" to="StateMachine/RetractBottomDrill" method="_on_animated_sprite_animation_finished"]
-[connection signal="animation_finished" from="Visuals/AnimatedSprite" to="StateMachine/ExtendSideDrill" method="_on_animated_sprite_animation_finished"]
-[connection signal="animation_finished" from="Visuals/AnimatedSprite" to="StateMachine/ExtendBottomDrill" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="StateMachine/TurnGround" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="StateMachine/TurnFlight" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="StateMachine/ExtendRotorSideDrill" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="StateMachine/ExtendRotorBottomDrill" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="StateMachine/RetractRotorBottomDrill" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="StateMachine/RetractRotorSideDrill" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="StateMachine/RetractSideDrill" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="StateMachine/RetractBottomDrill" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="StateMachine/ExtendSideDrill" method="_on_animated_sprite_animation_finished"]
+[connection signal="animation_finished" from="AnimatedSprite" to="StateMachine/ExtendBottomDrill" method="_on_animated_sprite_animation_finished"]
