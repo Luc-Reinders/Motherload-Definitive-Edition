@@ -381,7 +381,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"drill_down",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -398,7 +398,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"drill_side",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -415,7 +415,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"extend_bottom_drill",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -441,7 +441,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"extend_rotor_bottom_drill",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -479,7 +479,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"extend_rotor_side_drill",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -502,7 +502,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"extend_side_drill",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -522,7 +522,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"flight",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -551,7 +551,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"move",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -568,7 +568,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"retract_bottom_drill",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -594,7 +594,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"retract_rotor_bottom_drill",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -632,7 +632,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"retract_rotor_side_drill",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -655,7 +655,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"retract_side_drill",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -675,7 +675,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"turn_flight",
-"speed": 24.0
+"speed": 42.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -695,7 +695,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"turn_ground",
-"speed": 24.0
+"speed": 42.0
 }]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_dlmcl"]
@@ -718,10 +718,6 @@ script = ExtResource("3_dlmcl")
 
 [node name="CollisionShape" type="CollisionShape2D" parent="." unique_id=1317438549]
 shape = SubResource("RectangleShape2D_dlmcl")
-
-[node name="Camera" type="Camera2D" parent="." unique_id=1300423187]
-process_callback = 0
-position_smoothing_enabled = true
 
 [node name="StateMachine" type="Node" parent="." unique_id=1911924914 node_paths=PackedStringArray("initial_state")]
 script = ExtResource("3_jovdp")

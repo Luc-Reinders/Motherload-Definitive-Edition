@@ -35,56 +35,121 @@ func strong_finish_check(anim: StringName) -> bool:
 
 
 
-# TODO: Figure out how long between puffs
-const FRAMES_BETWEEN_PUFFS := 3
-const PUFF_FRAMES := 3 # number of puff frames
-
-var _puffing: bool = false
-var _time: float = 0.0
-var _tween: Tween = create_tween()
-
-var _init_y_offset: float
+var _init_x: float
+var _init_y: float
 func _ready() -> void:
-	_init_y_offset = position.y
+	_init_x = position.x
+	_init_y = position.y
 
 
 
-func is_idle_puffing() -> bool:
-	return _puffing
+## Handles puffing of the player whilst moving
 
-## Starts idle puffing on the character sprite. If the character was already
-## puffing, the command is ignored.
-func start_idle_puffing() -> void:
-	pass
-	if not _puffing:
-		_puffing = true
-		puff()
+enum PuffState {
+	NOT_PUFFING,
+	IDLE_PUFFING,
+	MOVE_PUFFING
+}
 
-## Stops idle puffing on the character sprite. If the puffing was already
-## stopped, the command is ignored.
-func stop_idle_puffing() -> void:
-	pass
-	if _puffing:
-		_puffing = false
-		_time = 0.0
-		_tween.kill() # Stops all tweening immediately
-		position.y = _init_y_offset
+# When idling (no buttons pressed), puff animation cycles every 11 frames (in flash fps)
+const IDLE_PUFF_OUT_FRAME_COUNT = 3
+const IDLE_INHALE_FRAME_COUNT = 8
 
+# When idling (no buttons pressed), puff animation cycles every 4 frames (in flash fps)
+const MOVE_PUFF_OUT_FRAME_COUNT = 3
+const MOVE_INHALE_FRAME_COUNT = 1
 
+var _puff_state: PuffState
+var _puff_tween: Tween = create_tween()
 
-func _process(delta: float) -> void:
-	pass
-	if _puffing:
-		_time += delta
-		if _time >= (FRAMES_BETWEEN_PUFFS + PUFF_FRAMES) / Constants.FLASH_FPS:
-			puff()
-			_time = 0.0
+## Checks whether character model is currently in the given puff state
+func is_puff_state(puff_state: PuffState) -> bool:
+	return _puff_state == puff_state
 
-func puff():
+## Starts puffing with in the given puff state. Ignores command if puff state is NOT_PUFFING
+func start_puffing(puff_state: PuffState) -> void:
+	if puff_state == PuffState.NOT_PUFFING:
+		return
+	_puff_state = puff_state
+	_reset_and_start_puff_tween(puff_state)
+
+## Stops puffing. Note that this does not do anything if puffing is already stopped.
+func stop_puffing() -> void:
+	_puff_state = PuffState.NOT_PUFFING
+	_puff_tween.kill()
+	position.y = _init_y
+
+## Resets the tween and starts it. The tween will loop indefinitely until stopped (or restarted).
+func _reset_and_start_puff_tween(puff_type: PuffState) -> void:
 	# Resets tween
-	_tween.kill()
-	_tween = create_tween()
+	_puff_tween.kill()
+	_puff_tween = create_tween()
+	_puff_tween.set_loops()
 	
-	_tween.tween_property(self, "position:y", _init_y_offset + 1.0, 1.0/Constants.FLASH_FPS)
-	_tween.tween_property(self, "position:y", _init_y_offset + 0.5, 1.0/Constants.FLASH_FPS)
-	_tween.tween_property(self, "position:y", _init_y_offset + 0.0, 1.0/Constants.FLASH_FPS)
+	var puff_out_time := 1.0 / Constants.FLASH_FPS
+	var inhale_time := 1.0 / Constants.FLASH_FPS
+	
+	var post_puff_out_wait_time: float
+	var post_inhale_wait_time: float
+	if puff_type == PuffState.IDLE_PUFFING:
+		post_puff_out_wait_time = (IDLE_PUFF_OUT_FRAME_COUNT - 1) / Constants.FLASH_FPS
+		post_inhale_wait_time = (IDLE_INHALE_FRAME_COUNT - 1) / Constants.FLASH_FPS
+	elif puff_type == PuffState.MOVE_PUFFING: # inhale time var will always be 0
+		post_puff_out_wait_time = (MOVE_PUFF_OUT_FRAME_COUNT - 1) / Constants.FLASH_FPS
+		post_inhale_wait_time = (MOVE_INHALE_FRAME_COUNT - 1) / Constants.FLASH_FPS
+	
+	# puff out
+	_puff_tween.tween_property(self, "position:y", _init_y + 1.0, puff_out_time)
+	# wait
+	if post_puff_out_wait_time > 0.0:
+		_puff_tween.tween_interval(post_puff_out_wait_time)
+	# inhale
+	_puff_tween.tween_property(self, "position:y", _init_y + 0.5, inhale_time)
+	_puff_tween.tween_property(self, "position:y", _init_y + 0.0, inhale_time)
+	# wait
+	if post_inhale_wait_time > 0.0:
+		_puff_tween.tween_interval(post_inhale_wait_time)
+
+
+
+
+
+## Handles shaking of the player when digging
+
+const DIG_DOWN_SHAKE_X = 1
+const DIG_SIDE_SHAKE_Y = 1
+
+var _shake_tween: Tween = create_tween()
+
+func start_shaking(dig_direction: AbstractPlayer.DigDirection) -> void:
+	_reset_and_start_shake_tween(dig_direction)
+
+func stop_shaking() -> void:
+	_shake_tween.kill()
+	position.x = _init_x
+	position.y = _init_y
+
+func _reset_and_start_shake_tween(dig_direction: AbstractPlayer.DigDirection) -> void:
+	# Resets tween
+	_shake_tween.kill()
+	_shake_tween = create_tween()
+	_shake_tween.set_loops()
+	
+	var shake_interval := 1.0 / Constants.FLASH_FPS
+	
+	if dig_direction == AbstractPlayer.DigDirection.DOWN:
+		if flip_h: # facing right, so start shaking to the right first (extremely minor detail)
+			_shake_tween.tween_property(self, "position:x", _init_x + DIG_DOWN_SHAKE_X, 0.0)
+			_shake_tween.tween_interval(shake_interval)
+			_shake_tween.tween_property(self, "position:x", _init_x - DIG_DOWN_SHAKE_X, 0.0)
+			_shake_tween.tween_interval(shake_interval)
+		else: # facing right, so start shaking to the left first (extremely minor detail)
+			_shake_tween.tween_property(self, "position:x", _init_x - DIG_DOWN_SHAKE_X, 0.0)
+			_shake_tween.tween_interval(shake_interval)
+			_shake_tween.tween_property(self, "position:x", _init_x + DIG_DOWN_SHAKE_X, 0.0)
+			_shake_tween.tween_interval(shake_interval)
+	elif dig_direction == AbstractPlayer.DigDirection.SIDE:
+		_shake_tween.tween_property(self, "position:y", _init_y + DIG_SIDE_SHAKE_Y, 0.0)
+		_shake_tween.tween_interval(shake_interval)
+		_shake_tween.tween_property(self, "position:y", _init_y, 0.0)
+		_shake_tween.tween_interval(shake_interval)

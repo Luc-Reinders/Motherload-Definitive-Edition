@@ -1,6 +1,8 @@
 class_name Constants
 
-const FLASH_FPS := 24.0
+const RESOLUTION := Vector2i(550, 400)
+
+const FLASH_FPS := 42.0
 
 const GRAVITY := 9.81
 const GROUND_FRICTION := 0.94

@@ -3,12 +3,9 @@ class_name AbstractPlayer
 
 # TODO for the player:
 # 2. Recreate player hitbox
-# 3. Figure out value of FLASH_FPS
-# 4. Implement idle and drilling vibration (look at idle() function?)
-# 5. Check whether rotation is correct. What is pivot of rotation in flash motherload?
 # 6. Make some of the state machine code nicer
-# 7. Implement camera tracking
 # 8. Verify whether movement code is executed also whilst drilling (i dont think it is)
+# 9. Chunks when digging
 
 
 enum DigDirection {
@@ -452,7 +449,8 @@ func _process_moving_as_subroutine(xVel: float, yVel: float, delta_f: float) -> 
 			xVel = maxf(xVel - (float(engine.base_power) / float(calculate_weight())) * delta_f, -engine.base_power / 10.0)
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			steam_count += 4 * delta_f
-		elif u and not is_turning(): # on floor and turning means pod can't take off
+		
+		if u and not is_turning(): # on floor and turning means pod can't take off
 			yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight())) * 2 * delta_f, -engine.base_power / 10.0)
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			
@@ -462,8 +460,9 @@ func _process_moving_as_subroutine(xVel: float, yVel: float, delta_f: float) -> 
 		# Set rotation to 0 degrees and rotor speed to 0 since we are on the ground
 		anim_sprite.rotation_degrees = 0
 		rotor_speed = 0
-		
-	else: # Airborn case I guess? 
+	
+	# Player is airborn
+	else: 
 		if r:
 			xVel = minf(xVel + (float(engine.base_power) / float(calculate_weight()) / 1.5) * delta_f, engine.base_power / 10.0)
 			anim_sprite.rotation_degrees = minf(anim_sprite.rotation_degrees + (engine.base_power / 50.0) * delta_f, 15)
@@ -471,7 +470,7 @@ func _process_moving_as_subroutine(xVel: float, yVel: float, delta_f: float) -> 
 			rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
 			steam_count += 2 * delta_f
 		elif l:
-			xVel = maxf(xVel - (float(engine.base_power)/float(calculate_weight())/1.5)*delta_f, -engine.base_power / 10.0)
+			xVel = maxf(xVel - (float(engine.base_power)/float(calculate_weight())/1.5) * delta_f, -engine.base_power / 10.0)
 			anim_sprite.rotation_degrees = maxf(anim_sprite.rotation_degrees - (engine.base_power / 50.0) * delta_f, -15)
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			rotor_speed = minf(rotor_speed + 0.3 * delta_f, 11)
@@ -490,7 +489,7 @@ func _process_moving_as_subroutine(xVel: float, yVel: float, delta_f: float) -> 
 				yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight())) * delta_f, -engine.base_power / 12.0)
 			else:
 				yVel = maxf(yVel - (float(engine.base_power) / float(calculate_weight()) / 1.5) * delta_f, -engine.base_power / 12.0)
-			anim_sprite.rotation_degrees *= 0.7 # Random rotation resistance? Why?
+			anim_sprite.rotation_degrees *= 0.7 # Moves rotation to 0 faster
 			fuel -= (engine.base_power / 50000.0) * delta_f
 			steam_count += 4 * delta_f
 			
@@ -509,8 +508,8 @@ func _process_moving_as_subroutine(xVel: float, yVel: float, delta_f: float) -> 
 
 
 # TODO: move contants up?
-const STEAM_PUFF_OFFSET_X := 24
-const STEAM_PUFF_OFFSET_Y := -23
+const STEAM_PUFF_OFFSET_X := 21
+const STEAM_PUFF_OFFSET_Y := -17
 const STEAM_PUFF_ROTATION_OFFSET := -20
 const STEAM_PUFF_ROTATION_MAX_DEV := 39
 func spawn_steam_puff() -> void:

@@ -5,13 +5,24 @@ class_name PlayerFlashMoveState
 
 func enter():
 	anim_sprite.play(FlashPlayerAnimatedSprite.MOVE_ANIM)
-	anim_sprite.start_idle_puffing()
 
 func update(_delta):
 	var right = Input.is_action_pressed("move_right")
 	var left = Input.is_action_pressed("move_left")
 	var up = Input.is_action_pressed("move_up")
 	var down = Input.is_action_pressed("move_down")
+	
+	# This code handles the puffing state of the player character:
+	# If the player is actively moving left or right, the puffing state should be set to moving.
+	# We first check whether it is not already in the moving puff state.
+	# If the player has no active inputs and it is not already in the idle puffing state, we set 
+	# the puffing state to the idle puffing state.
+	if left or right:
+		if not anim_sprite.is_puff_state(FlashPlayerAnimatedSprite.PuffState.MOVE_PUFFING):
+			anim_sprite.start_puffing(FlashPlayerAnimatedSprite.PuffState.MOVE_PUFFING)
+	elif not up and not down:
+		if not anim_sprite.is_puff_state(FlashPlayerAnimatedSprite.PuffState.IDLE_PUFFING):
+			anim_sprite.start_puffing(FlashPlayerAnimatedSprite.PuffState.IDLE_PUFFING)
 	
 	# TODO: Give better explanation of this magic formula?
 	# Update animation speed depending on x velocity. This formula is based on the decompiled
@@ -50,7 +61,8 @@ func update(_delta):
 				go_to_state(StateMachinePlayerFlash.DIG_SIDE_STATE)
 
 
-func go_to_state(state_name: String):
+
+func go_to_state(state_name: StringName):
 	player.anim_sprite.speed_scale = 1
-	anim_sprite.stop_idle_puffing()
+	anim_sprite.stop_puffing()
 	transitioned.emit(self, state_name)
