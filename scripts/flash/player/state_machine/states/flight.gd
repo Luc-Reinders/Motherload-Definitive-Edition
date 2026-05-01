@@ -25,8 +25,16 @@ func update(_delta):
 	anim_sprite.speed_scale = (player.rotor_speed/5.0)
 	
 	if player.is_on_floor() and not player.will_bounce_this_frame():
+		# Attempt digging down
 		if down:
-			go_to_state(StateMachinePlayerFlash.RETRACT_ROTOR_BOTTOM_DRILL_STATE)
+			var dig_check: AbstractPlayer.DigCheckResult = player.dig_check(AbstractPlayer.DigDirection.DOWN)
+			if dig_check == AbstractPlayer.DigCheckResult.VALID: 
+				# Digging success, start preparing for digging down
+				player.perpare_for_digging()
+				go_to_state(StateMachinePlayerFlash.RETRACT_ROTOR_BOTTOM_DRILL_STATE)
+			elif dig_check == AbstractPlayer.DigCheckResult.HARD:
+				pass #TODO: add "clink" sound effect here
+		# Goes towards moving state
 		else:
 			go_to_state(StateMachinePlayerFlash.RETRACT_ROTOR_SIDE_DRILL_STATE)
 	else:

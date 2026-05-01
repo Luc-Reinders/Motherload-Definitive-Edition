@@ -87,7 +87,7 @@ animations = [{
 }],
 "loop": false,
 "name": &"puff",
-"speed": 24.0
+"speed": 42.0
 }]
 
 [node name="SteamParticle" type="Node2D" unique_id=209343065]

@@ -1,0 +1,23 @@
+[gd_scene format=3 uid="uid://cbog77vjfxelf"]
+
+[ext_resource type="Script" uid="uid://cusdrfk12chh2" path="res://scripts/abstract/player/rock_chunk.gd" id="1_7we6h"]
+[ext_resource type="Texture2D" uid="uid://bjogce61xouj0" path="res://assets/sprites/chunks/chunk1.png" id="2_uodxn"]
+[ext_resource type="Texture2D" uid="uid://csg4j8pdar1t1" path="res://assets/sprites/chunks/chunk2.png" id="3_o1dn5"]
+[ext_resource type="Texture2D" uid="uid://dw6omeh4ajvs" path="res://assets/sprites/chunks/chunk3.png" id="4_wh4tm"]
+[ext_resource type="Texture2D" uid="uid://du6b32wgak852" path="res://assets/sprites/chunks/chunk4.png" id="5_l2nb0"]
+[ext_resource type="Texture2D" uid="uid://b1om6lyyb5k82" path="res://assets/sprites/chunks/chunk5.png" id="6_7r1df"]
+[ext_resource type="Texture2D" uid="uid://c5jul32nnmnp4" path="res://assets/sprites/chunks/chunk6.png" id="7_36p1u"]
+[ext_resource type="Texture2D" uid="uid://ctgdd3ibe6a8v" path="res://assets/sprites/chunks/chunk7.png" id="8_naatp"]
+[ext_resource type="Texture2D" uid="uid://1fqjopw6kgm" path="res://assets/sprites/chunks/chunk8.png" id="9_opqbp"]
+
+[node name="Chunk" type="Node2D" unique_id=359451937]
+script = ExtResource("1_7we6h")
+textures = Array[Texture2D]([ExtResource("2_uodxn"), ExtResource("3_o1dn5"), ExtResource("4_wh4tm"), ExtResource("5_l2nb0"), ExtResource("6_7r1df"), ExtResource("7_36p1u"), ExtResource("8_naatp"), ExtResource("9_opqbp")])
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=1337883012]
+texture = ExtResource("2_uodxn")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=807014407]
+rect = Rect2(-7.5, -7.5, 15, 15)
+
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]

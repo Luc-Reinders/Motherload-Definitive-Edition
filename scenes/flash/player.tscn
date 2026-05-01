@@ -5,6 +5,7 @@
 [ext_resource type="Texture2D" uid="uid://casbr08nhbpbd" path="res://assets/sprites/Pod Horizontally Centered Spritesheet.png" id="3_58ri8"]
 [ext_resource type="Script" uid="uid://bv515cwnwnc5x" path="res://scripts/flash/player/animated_sprite.gd" id="3_dlmcl"]
 [ext_resource type="Script" uid="uid://cm1a2ibk1t2qp" path="res://scripts/flash/player/state_machine/state_machine.gd" id="3_jovdp"]
+[ext_resource type="PackedScene" uid="uid://cbog77vjfxelf" path="res://scenes/chunk.tscn" id="3_velq2"]
 [ext_resource type="Script" uid="uid://jcy3vsg5ofdi" path="res://scripts/flash/player/state_machine/states/move.gd" id="4_jovdp"]
 [ext_resource type="Script" uid="uid://l7h2c6evy4tw" path="res://scripts/flash/player/state_machine/states/flight.gd" id="5_58ri8"]
 [ext_resource type="Script" uid="uid://b7xsjy0jicfb4" path="res://scripts/flash/player/state_machine/states/turn_ground.gd" id="6_7csyp"]
@@ -707,6 +708,7 @@ anim_sprite = NodePath("AnimatedSprite")
 collision_shape = NodePath("CollisionShape")
 state_machine = NodePath("StateMachine")
 puff_scene = ExtResource("2_vnqnq")
+chunk_scene = ExtResource("3_velq2")
 pod_mass = 198
 
 [node name="AnimatedSprite" type="AnimatedSprite2D" parent="." unique_id=1141550430]

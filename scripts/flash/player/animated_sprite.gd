@@ -59,31 +59,38 @@ const IDLE_INHALE_FRAME_COUNT = 8
 const MOVE_PUFF_OUT_FRAME_COUNT = 3
 const MOVE_INHALE_FRAME_COUNT = 1
 
-var _puff_state: PuffState
-var _puff_tween: Tween = create_tween()
+var _puff_state: PuffState = PuffState.NOT_PUFFING
+var _puff_tween: Tween
 
 ## Checks whether character model is currently in the given puff state
 func is_puff_state(puff_state: PuffState) -> bool:
 	return _puff_state == puff_state
 
-## Starts puffing with in the given puff state. Ignores command if puff state is NOT_PUFFING
+## Starts puffing with in the given puff state. Ignores command if player is already puffing or 
+## if the given puff state would make the player stop puffing. Use stop_puffing() for that idiot.
 func start_puffing(puff_state: PuffState) -> void:
-	if puff_state == PuffState.NOT_PUFFING:
+	if _puff_state != PuffState.NOT_PUFFING or puff_state == PuffState.NOT_PUFFING:
 		return
 	_puff_state = puff_state
 	_reset_and_start_puff_tween(puff_state)
 
-## Stops puffing. Note that this does not do anything if puffing is already stopped.
+## Stops puffing. Ignores command if player has already stopped puffing
 func stop_puffing() -> void:
+	if _puff_state == PuffState.NOT_PUFFING:
+		return
 	_puff_state = PuffState.NOT_PUFFING
 	_puff_tween.kill()
 	position.y = _init_y
 
 ## Resets the tween and starts it. The tween will loop indefinitely until stopped (or restarted).
 func _reset_and_start_puff_tween(puff_type: PuffState) -> void:
-	# Resets tween
-	_puff_tween.kill()
-	_puff_tween = create_tween()
+	# If puff tween doesn't exist, create it 
+	if not _puff_tween:
+		_puff_tween = create_tween()
+	# If puff tween already exists, kill current actions and re-create it
+	else:
+		_puff_tween.kill()
+		_puff_tween = create_tween()
 	_puff_tween.set_loops()
 	
 	var puff_out_time := 1.0 / Constants.FLASH_FPS
@@ -119,37 +126,51 @@ func _reset_and_start_puff_tween(puff_type: PuffState) -> void:
 const DIG_DOWN_SHAKE_X = 1
 const DIG_SIDE_SHAKE_Y = 1
 
-var _shake_tween: Tween = create_tween()
+var _shake_tween: Tween
+var _shaking: bool = false
 
+## Starts shaking the player character. Ignores command if player character is already shaking
 func start_shaking(dig_direction: AbstractPlayer.DigDirection) -> void:
+	if _shaking:
+		return
+	_shaking = true
 	_reset_and_start_shake_tween(dig_direction)
 
+## Stops shaking the player character. Ignores command if player is not currently shaking.
 func stop_shaking() -> void:
+	if not _shaking:
+		return
+	_shaking = false
 	_shake_tween.kill()
 	position.x = _init_x
 	position.y = _init_y
 
 func _reset_and_start_shake_tween(dig_direction: AbstractPlayer.DigDirection) -> void:
-	# Resets tween
-	_shake_tween.kill()
-	_shake_tween = create_tween()
+	# If puff tween already exists, kill current actions and re-create it
+	if _shake_tween:
+		_shake_tween.kill()
+		_shake_tween = create_tween()
+	# If puff tween doesn't exist, create it 
+	else:
+		_shake_tween = create_tween()
 	_shake_tween.set_loops()
 	
 	var shake_interval := 1.0 / Constants.FLASH_FPS
 	
+	# Using tween_callback instead of tween_property, because godot cries about it if interval is 0
 	if dig_direction == AbstractPlayer.DigDirection.DOWN:
 		if flip_h: # facing right, so start shaking to the right first (extremely minor detail)
-			_shake_tween.tween_property(self, "position:x", _init_x + DIG_DOWN_SHAKE_X, 0.0)
+			_shake_tween.tween_callback(func(): position.x = _init_x + DIG_DOWN_SHAKE_X)
 			_shake_tween.tween_interval(shake_interval)
-			_shake_tween.tween_property(self, "position:x", _init_x - DIG_DOWN_SHAKE_X, 0.0)
+			_shake_tween.tween_callback(func(): position.x = _init_x - DIG_DOWN_SHAKE_X)
 			_shake_tween.tween_interval(shake_interval)
 		else: # facing right, so start shaking to the left first (extremely minor detail)
-			_shake_tween.tween_property(self, "position:x", _init_x - DIG_DOWN_SHAKE_X, 0.0)
+			_shake_tween.tween_callback(func(): position.x = _init_x - DIG_DOWN_SHAKE_X)
 			_shake_tween.tween_interval(shake_interval)
-			_shake_tween.tween_property(self, "position:x", _init_x + DIG_DOWN_SHAKE_X, 0.0)
+			_shake_tween.tween_callback(func(): position.x = _init_x + DIG_DOWN_SHAKE_X)
 			_shake_tween.tween_interval(shake_interval)
 	elif dig_direction == AbstractPlayer.DigDirection.SIDE:
-		_shake_tween.tween_property(self, "position:y", _init_y + DIG_SIDE_SHAKE_Y, 0.0)
+		_shake_tween.tween_callback(func(): position.y = _init_y - DIG_SIDE_SHAKE_Y)
 		_shake_tween.tween_interval(shake_interval)
-		_shake_tween.tween_property(self, "position:y", _init_y, 0.0)
+		_shake_tween.tween_callback(func(): position.y = _init_y)
 		_shake_tween.tween_interval(shake_interval)

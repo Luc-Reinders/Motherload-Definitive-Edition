@@ -1,4 +1,4 @@
-[gd_scene format=4 uid="uid://471ds1rsbjjk"]
+[gd_scene format=3 uid="uid://471ds1rsbjjk"]
 
 [ext_resource type="Script" uid="uid://burvpvtcdgdrg" path="res://scripts/flash/motherload.gd" id="1_oml67"]
 [ext_resource type="PackedScene" uid="uid://5fff2iprddre" path="res://scenes/flash/earth.tscn" id="2_tn58e"]
@@ -9,7 +9,6 @@
 script = ExtResource("1_oml67")
 
 [node name="Earth" parent="." unique_id=643595024 instance=ExtResource("2_tn58e")]
-tile_map_data = PackedByteArray("AAD2////AAAFAAAAAAD3////AAAFAAAAAAD4////AAAFAAAAAAD5////AAAFAAAAAAD6////AAAFAAAAAAD7////AAAFAAAAAAD8////AAAFAAAAAAD9////AAAFAAAAAAD+////AAAFAAAAAAD/////AAAFAAAAAAAAAP//AAAFAAAAAAABAP//AAAFAAAAAAACAP//AAAFAAAAAAADAP//AAAFAAAAAAAEAP//AAAFAAAAAAAFAP//AAAFAAAAAAAGAP//AAAFAAAAAAAHAP//AAAFAAAAAAAIAP//AAAFAAAAAAAJAP//AAAFAAAAAAAKAP//AAAFAAAAAAA=")
 
 [node name="Player" parent="." unique_id=25987061 node_paths=PackedStringArray("earth") instance=ExtResource("3_n1yvv")]
 position = Vector2(0, -79)

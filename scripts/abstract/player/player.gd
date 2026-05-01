@@ -5,8 +5,10 @@ class_name AbstractPlayer
 # 2. Recreate player hitbox
 # 6. Make some of the state machine code nicer
 # 8. Verify whether movement code is executed also whilst drilling (i dont think it is)
-# 9. Chunks when digging
-
+# 10. Steam particles resolution too low compared to flash. Use svg?
+# 11. Generalize RNG into objects
+# 12. Are the chunks properly aligned when spawning when drilling to the side?
+# 13. Fix chunk colors. They look like-a shit
 
 enum DigDirection {
 	SIDE,
@@ -30,6 +32,8 @@ enum DigCheckResult {
 
 # Puff scene to create steam puffs
 @export var puff_scene: PackedScene
+# Chunk scene to create falling chunks
+@export var chunk_scene: PackedScene
 
 
 
@@ -62,6 +66,9 @@ var _digging_init_global_pos: Vector2
 var _digging_reload_flag: bool = false # For loading half dug tile, damaging player, and gas pockets
 var _digging_target_cell: Vector2i
 var _digging_x_align_velocity: float # aligning horizontally velocity for digging down
+
+const CHUNK_SPAWN_INTERVAL := 2.0 / Constants.FLASH_FPS
+var _digging_chunk_timer: float = 0.0
 
 func is_digging() -> bool:
 	return _digging
@@ -151,19 +158,6 @@ func dig_check(dig_direction: DigDirection) -> DigCheckResult:
 
 
 
-## Motherload has frame-dependent physics calculations. This means that the velocities used in the 
-## AS code have unit px/frame. The velocities in Godot have unit px/s. To make conversions between 
-## Godot's- and AS's velocities, we must fix an FPS value for Flash Motherload. Once we do that, 
-## we can easily convert between the velocities like this:
-## VelAS = velocity_godot / FLASH_FPS
-## velocity_godot = VelAS * FLASH_FPS
-static func convert_to_AS_velocity(godot_velocity: float) -> float:
-	return godot_velocity / Constants.FLASH_FPS 
-static func convert_to_godot_velocity(ASVel: float) -> float:
-	return ASVel * Constants.FLASH_FPS
-
-
-
 func calculate_weight() -> int:
 	push_error("calculate_weight() must be overridden!")
 	return -1
@@ -185,38 +179,39 @@ func get_depth() -> float:
 
 ## This method sets logic- and physics variables before preparing for digging.
 func perpare_for_digging() -> void:
+	anim_sprite.rotation_degrees = 0 
 	velocity = Vector2.ZERO
 	_digging_preparing = true
 
 ## This method sets logic- and physics variables pre-digging appropriately.
-func start_digging(drill_direction: DigDirection) -> void:
+func start_digging(dig_direction: DigDirection) -> void:
 	_digging_preparing = false
 	
 	# Set target cell
-	if drill_direction == DigDirection.DOWN:
+	if dig_direction == DigDirection.DOWN:
 		_digging_target_cell = get_cell_below()
-	elif drill_direction == DigDirection.SIDE: 
+	elif dig_direction == DigDirection.SIDE: 
 		_digging_target_cell = get_cell_side()
 	
 	# Set logic variables
 	_digging = true
-	_digging_direction = drill_direction
+	_digging_direction = dig_direction
 	_digging_init_global_pos = global_position
 	_digging_reload_flag = false
 	
 	# Calculate the digging velocity. First we calculate the actionscript velocity by mimicking the
 	# actionscript code. Then convert the actionscript velocity over to godot's velocity.
 	var digVel := calculate_dig_velocity_actionscript(get_depth(), drill.base_drill_speed)
-	_digging_velocity = convert_to_godot_velocity(digVel)
+	_digging_velocity = Util.convert_to_godot_velocity(digVel)
 	
-	if drill_direction == DigDirection.DOWN:
+	if dig_direction == DigDirection.DOWN:
 		# Here we set the horizontal align velocity when digging down. For the formula we require
 		# the difference between the player and the center of the tile in pixels. The formula to
 		# calculate the velocity is based on the Motherload code
 		var digging_target_global_pos := earth.to_global(earth.map_to_local(_digging_target_cell))
 		var player_to_target_diff := digging_target_global_pos - global_position
 		var xAlignVel := (float(player_to_target_diff.x) / 50.0) * digVel
-		_digging_x_align_velocity = convert_to_godot_velocity(xAlignVel)
+		_digging_x_align_velocity = Util.convert_to_godot_velocity(xAlignVel)
 		
 		velocity.y = _digging_velocity
 		velocity.x = _digging_x_align_velocity
@@ -228,6 +223,10 @@ func start_digging(drill_direction: DigDirection) -> void:
 	
 	# Disable collisions so player can move through ground
 	collision_shape.disabled = true 
+	
+	# In flash Motherload a chunk immediately appears when digging is started. So we do that too.
+	# TODO: add case where we dig lava tile
+	spawn_chunk(dig_direction, Chunk.ChunkType.ROCK)
 
 ## This method sets logic- and physics variables post-digging appropriately. It also updates the
 ## earth tiles with appropriate textures.
@@ -291,15 +290,15 @@ func _physics_process(delta: float) -> void:
 	var delta_f: float = delta * Constants.FLASH_FPS
 	
 	# Godot velocity -> AS velocity conversion
-	var xVel := convert_to_AS_velocity(velocity.x)
-	var yVel := convert_to_AS_velocity(velocity.y)
+	var xVel := Util.convert_to_AS_velocity(velocity.x)
+	var yVel := Util.convert_to_AS_velocity(velocity.y)
 	
 	# Run AS subroutine
-	var Vel := _physics_as_subroutine(xVel, yVel, delta_f)
+	var Vel := _physics_as_subroutine(xVel, yVel, delta_f, delta)
 	
 	# AS velocity -> Godot velocity conversion and apply the velocity
-	velocity.x = convert_to_godot_velocity(Vel.x)
-	velocity.y = convert_to_godot_velocity(Vel.y)
+	velocity.x = Util.convert_to_godot_velocity(Vel.x)
+	velocity.y = Util.convert_to_godot_velocity(Vel.y)
 	
 	move_and_slide() 
 
@@ -307,14 +306,23 @@ func _physics_process(delta: float) -> void:
 
 
 
-func _physics_as_subroutine(xVel: float, yVel: float, delta_f: float) -> Vector2:
+func _physics_as_subroutine(xVel: float, yVel: float, delta_f: float, delta: float) -> Vector2:
 	# Digging and player movement subroutines
 	if is_digging():
 		_process_digging_as_subroutine(delta_f)
+		
+		# Digging will continue; check for chunk spawning
+		if is_digging():
+			_digging_chunk_timer += delta
+			if _digging_chunk_timer >= CHUNK_SPAWN_INTERVAL:
+				# TODO: add case where we dig lava tile
+				spawn_chunk(_digging_direction, Chunk.ChunkType.ROCK)
+				_digging_chunk_timer -= CHUNK_SPAWN_INTERVAL # Reset timer
 		# Digging has stopped this frame
 		if not is_digging():
 			xVel = 0
 			yVel = 0
+			_digging_chunk_timer = 0.0
 	elif not is_preparing_for_digging():
 		var Vel : Vector2 = _process_moving_as_subroutine(xVel, yVel, delta_f)
 		xVel = Vel.x
@@ -526,7 +534,38 @@ func spawn_steam_puff() -> void:
 		puff.animated_sprite.flip_h = true
 	
 	# Setting position and adding some randomness like in the Motherload code
-	var base_pos: Vector2 = anim_sprite.global_position
-	puff.global_position.x = base_pos.x + offset + randi_range(0, 1) * 3 
-	puff.global_position.y = base_pos.y + STEAM_PUFF_OFFSET_Y
+	var sprite_pos: Vector2 = anim_sprite.global_position
+	puff.global_position.x = sprite_pos.x + offset + randi_range(0, 1) * 3 
+	puff.global_position.y = sprite_pos.y + STEAM_PUFF_OFFSET_Y
 	puff.pivot.rotation_degrees = randi_range(0, STEAM_PUFF_ROTATION_MAX_DEV) + STEAM_PUFF_ROTATION_OFFSET
+
+
+
+# TODO: Compare with flash Motherload footage whether these values are accurate
+const CHUNK_OFFSET_X_SIDEWAY_DIG = 42
+const CHUNK_OFFSET_Y_SIDEWAY_DIG = -9
+const CHUNK_OFFSET_X_DOWN_DIG = 0.0
+const CHUNK_OFFSET_Y_DOWN_DIG = 27.5
+func spawn_chunk(dig_direction: DigDirection, chunk_type: Chunk.ChunkType) -> void:
+	var chunk: Chunk = chunk_scene.instantiate()
+	chunk.chunk_type = chunk_type
+	get_tree().current_scene.add_child(chunk)
+	
+	# Calculate offset in spawn position
+	var offset_x: float
+	var offset_y: float
+	if dig_direction == DigDirection.DOWN:
+		offset_x = CHUNK_OFFSET_X_DOWN_DIG
+		offset_y = CHUNK_OFFSET_Y_DOWN_DIG
+	elif dig_direction == DigDirection.SIDE:
+		if is_facing_right():
+			offset_x = CHUNK_OFFSET_X_SIDEWAY_DIG
+			offset_y = CHUNK_OFFSET_Y_SIDEWAY_DIG
+		else:
+			offset_x = -CHUNK_OFFSET_X_SIDEWAY_DIG
+			offset_y = CHUNK_OFFSET_Y_SIDEWAY_DIG
+	
+	# Set spawn position based on randomness from AS code.
+	var sprite_pos: Vector2 = anim_sprite.global_position
+	chunk.global_position.x = sprite_pos.x + offset_x + randf_range(-4.5, 4.5)
+	chunk.global_position.y = sprite_pos.y + offset_y + randf_range(-4.5, 4.5)
