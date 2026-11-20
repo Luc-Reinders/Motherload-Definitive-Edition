@@ -14,7 +14,9 @@ var chunk_type: ChunkType
 var xVel: float
 var yVel: float
 
+# TODO: group sprite and glow sprite together in one node?
 @onready var sprite: Sprite2D = $Sprite
+@onready var glow: Sprite2D  = $GlowSprite
 @onready var on_screen_notifier: VisibleOnScreenNotifier2D = $VisibleOnScreenNotifier2D
 
 @export var textures: Array[Texture2D]
@@ -23,22 +25,24 @@ var yVel: float
 
 func _ready() -> void:
 	# Select 1 of 8 random chunk textures
-	sprite.texture = textures.pick_random()
+	var texture = textures.pick_random()
+	sprite.texture = texture
+	glow.texture = texture
 	
-	# TODO: Find out true masking color cuz this ain't it boss.
-	sprite.modulate = Color(3.0,2.9, 0, 1.0)
-	# Apply color shift to 
+	# Fade glow out
 	var tween_color = create_tween()
 	if chunk_type == ChunkType.ROCK:
-		tween_color.tween_property(sprite, "modulate", Color.WHITE, COLOR_TRANSITION_DURATION)
+		glow.modulate = Color(18.892, 18.892, 0.0, 0.337) # TODO: fine tune color later perhaps
 	elif chunk_type == ChunkType.LAVA:
 		# TODO: is this color accurate?
-		tween_color.tween_property(sprite, "modulate", Color(3,0.2,0), COLOR_TRANSITION_DURATION)
+		glow.modulate = Color(18.892, 0.0, 0.0, 0.692)
+	tween_color.tween_property(glow, "modulate:a", 0.0, COLOR_TRANSITION_DURATION)
 	
 	# Randomly scales the sprite
 	# TODO: generalize this to use an RNG object
 	var random_scale = randf_range(0, 1.25) + 0.25
 	sprite.scale *= random_scale
+	glow.scale *= random_scale
 	on_screen_notifier.scale *= random_scale
 	
 	# Generate random velocity

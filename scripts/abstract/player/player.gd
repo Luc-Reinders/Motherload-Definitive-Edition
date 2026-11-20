@@ -2,6 +2,7 @@ extends CharacterBody2D
 class_name AbstractPlayer
 
 # TODO for the player:
+# 0. Organize todo list into player, ui, etc.
 # 2. Recreate player hitbox
 # 6. Make some of the state machine code nicer
 # 8. Verify whether movement code is executed also whilst drilling (i dont think it is)
@@ -9,6 +10,10 @@ class_name AbstractPlayer
 # 11. Generalize RNG into objects
 # 12. Are the chunks properly aligned when spawning when drilling to the side?
 # 13. Fix chunk colors. They look like-a shit
+
+# BUG: Drill down immediately after digging sideways with nothing beneath you causes bad shit
+# BUG: Landing and going in the opposite direction before the animation is finished causes moonwalking. Micheal Jackson ahh behavior
+# BUG: Drilling down very deep can cause player to not move down at all whilst drilling
 
 enum DigDirection {
 	SIDE,

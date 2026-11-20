@@ -10,11 +10,19 @@
 [ext_resource type="Texture2D" uid="uid://ctgdd3ibe6a8v" path="res://assets/sprites/chunks/chunk7.png" id="8_naatp"]
 [ext_resource type="Texture2D" uid="uid://1fqjopw6kgm" path="res://assets/sprites/chunks/chunk8.png" id="9_opqbp"]
 
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_7we6h"]
+blend_mode = 1
+
 [node name="Chunk" type="Node2D" unique_id=359451937]
 script = ExtResource("1_7we6h")
 textures = Array[Texture2D]([ExtResource("2_uodxn"), ExtResource("3_o1dn5"), ExtResource("4_wh4tm"), ExtResource("5_l2nb0"), ExtResource("6_7r1df"), ExtResource("7_36p1u"), ExtResource("8_naatp"), ExtResource("9_opqbp")])
 
 [node name="Sprite" type="Sprite2D" parent="." unique_id=1337883012]
+texture = ExtResource("2_uodxn")
+
+[node name="GlowSprite" type="Sprite2D" parent="." unique_id=217049392]
+modulate = Color(18.892, 18.892, 0, 0.337)
+material = SubResource("CanvasItemMaterial_7we6h")
 texture = ExtResource("2_uodxn")
 
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=807014407]
